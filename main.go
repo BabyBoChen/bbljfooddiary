@@ -4,14 +4,21 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/template/html/v2"
 	_ "github.com/lib/pq"
 )
 
+var sessionStore *session.Store
+
 func index(c *fiber.Ctx) error {
-	return c.Render("index", fiber.Map{
-		"Title": "Hello, World!",
-	})
+	viewModel := make(fiber.Map)
+	viewModel["Title"] = "Hello, World!"
+	sess, err := sessionStore.Get(c)
+	if err == nil {
+		viewModel["SessId"] = sess.ID()
+	}
+	return c.Render("index", viewModel)
 }
 
 func main() {
@@ -20,6 +27,8 @@ func main() {
 	engine.Reload(true) // Optional. Default: false
 	// Debug will print each template that is parsed, good for debugging
 	engine.Debug(true) // Optional. Default: false
+
+	sessionStore = session.New()
 
 	app := fiber.New(fiber.Config{
 		Views: engine,
