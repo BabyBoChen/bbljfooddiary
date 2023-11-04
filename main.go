@@ -8,6 +8,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
+func index(c *fiber.Ctx) error {
+	return c.Render("index", fiber.Map{
+		"Title": "Hello, World!",
+	})
+}
+
 func main() {
 	engine := html.New("./views", ".html")
 	// Reload the templates on each render, good for development
@@ -18,11 +24,10 @@ func main() {
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
+
 	app.Static("/", "./wwwroot")
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.Render("index", fiber.Map{
-			"Title": "Hello, World!",
-		})
-	})
+
+	app.Get("/", index)
+
 	log.Fatal(app.Listen(":3000"))
 }
