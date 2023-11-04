@@ -1,0 +1,58 @@
+body{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-color: #202020;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    color:#c4c4c4;
+    overflow: auto;
+    margin: 0px;
+}
+.navbar{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 43px;
+    background-color: #121212;
+    padding: 15px;
+    border-bottom: 2px solid green;
+}
+.v-center {
+    position: absolute;
+    top:50%; 
+    -ms-transform: translateY(-50%); 
+    transform: translateY(-50%);
+}
+.navbar-logo {
+    font-size: 26px;
+}
+.fa-wrapper{
+    font-size: 2em;
+}
+.site-content{
+    position: absolute;
+    top: 75px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+}
+.welcome-header{
+    margin-top: 15px;
+}
+.h-center{
+    width: 100%;
+    text-align: center;
+}
+.page-title{
+    text-align: center;
+    color:white;
+}
+.welcome-msg {
+    text-align: center;
+    font-size: 18px;
+    margin: 0px 20px;
+}
