@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/BabyBoChen/bbljfooddiary/secrets"
+	"github.com/BabyBoChen/bbljfooddiary/utils"
 )
 
 type DropboxClient struct {
@@ -81,6 +82,9 @@ func (dropbox *DropboxClient) UploadFile(folderPath string, f *os.File) (map[str
 		req.Header.Set("Content-Type", "application/octet-stream")
 		args := make(map[string]interface{})
 		args["path"] = folderPath + "/" + filepath.Base(f.Name())
+		mode := make(map[string]interface{})
+		mode[".tag"] = "overwrite"
+		args["mode"] = mode
 		argsJson, err = json.Marshal(args)
 	}
 
@@ -204,31 +208,126 @@ func (dropbox *DropboxClient) ListFolder(remoteFolderFullPath string) (map[strin
 		err = json.Unmarshal(respBody, &respJson)
 	}
 
-	// var entries []interface{}
-	// if err == nil {
-	// 	entries, err = utils.InterfaceSlice(respJson["entries"])
-	// }
+	var entries []interface{}
+	if err == nil {
+		entries, err = utils.InterfaceSlice(respJson["entries"])
+	}
 
-	// if err == nil {
-	// 	hasMore := respJson["has_more"].(bool)
-	// 	for hasMore == true && err == nil {
-	// 		var more map[string]interface{}
-	// 		more, err = dropbox.listFolderMore(respJson["cursor"].(string))
+	if err == nil {
+		hasMore := respJson["has_more"].(bool)
+		for hasMore && err == nil {
+			var more map[string]interface{}
+			more, err = dropbox.listFolderMore(respJson["cursor"].(string))
 
-	// 		var moreEntries []interface{}
-	// 		if err == nil {
-	// 			hasMore = more["has_more"].(bool)
-	// 			moreEntries, err = utils.InterfaceSlice(more["entries"])
-	// 		}
-	// 		if err == nil {
-	// 			entries = append(entries, moreEntries...)
-	// 		}
-	// 	}
-	// }
+			var moreEntries []interface{}
+			if err == nil {
+				hasMore = more["has_more"].(bool)
+				moreEntries, err = utils.InterfaceSlice(more["entries"])
+			}
+			if err == nil {
+				entries = append(entries, moreEntries...)
+			}
+		}
+	}
 
-	// if err == nil {
-	// 	respJson["entries"] = entries
-	// }
+	if err == nil {
+		respJson["entries"] = entries
+	}
 
 	return respJson, err
+}
+
+func (dropbox *DropboxClient) listFolderMore(cursor string) (map[string]interface{}, error) {
+	var respJson map[string]interface{}
+	var err error
+
+	urlPath := "https://api.dropboxapi.com/2/files/list_folder/continue"
+
+	var body []byte
+	payload := make(map[string]interface{})
+	payload["cursor"] = cursor
+	body, err = json.Marshal(payload)
+	var req *http.Request
+	if err == nil {
+		req, err = http.NewRequest("POST", urlPath, bytes.NewBuffer(body))
+	}
+
+	var resp *http.Response
+	if err == nil {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", dropbox.accessToken))
+		req.Header.Set("Content-Type", "application/json")
+		client := &http.Client{}
+		resp, err = client.Do(req)
+	}
+
+	var respBody []byte
+	if err == nil {
+		if resp.StatusCode == 200 {
+			defer resp.Body.Close()
+			respBody, err = io.ReadAll(resp.Body)
+		} else {
+			err = errors.New("failed")
+		}
+	}
+
+	if err == nil {
+		err = json.Unmarshal(respBody, &respJson)
+	}
+
+	return respJson, err
+}
+
+func (dropbox *DropboxClient) GetSharedLink(remoteFullPath string) ([]string, error) {
+	var sharedLink []string
+	var err error
+
+	urlPath := "https://api.dropboxapi.com/2/sharing/list_shared_links"
+
+	var body []byte
+	payload := make(map[string]interface{})
+	payload["path"] = remoteFullPath
+	body, err = json.Marshal(payload)
+
+	var req *http.Request
+	if err == nil {
+		req, err = http.NewRequest("POST", urlPath, bytes.NewBuffer(body))
+	}
+
+	var resp *http.Response
+	if err == nil {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", dropbox.accessToken))
+		req.Header.Set("Content-Type", "application/json")
+		client := &http.Client{}
+		resp, err = client.Do(req)
+	}
+
+	var respBody []byte
+	if err == nil {
+		if resp.StatusCode == 200 {
+			defer resp.Body.Close()
+			respBody, err = io.ReadAll(resp.Body)
+		} else {
+			err = errors.New("failed")
+		}
+	}
+
+	var respJson map[string]interface{}
+	if err == nil {
+		err = json.Unmarshal(respBody, &respJson)
+	}
+
+	var links []interface{}
+	if err == nil {
+		links, err = utils.InterfaceSlice(respJson["links"])
+	}
+
+	if err == nil {
+		sharedLink = make([]string, len(links))
+		for i, linkMap := range links {
+			link := linkMap.(map[string]interface{})
+			sharedLink[i] = link["url"].(string)
+		}
+	}
+
+	return sharedLink, err
 }
