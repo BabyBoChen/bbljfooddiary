@@ -14,10 +14,6 @@ var sessionStore *session.Store
 func index(c *fiber.Ctx) error {
 	viewModel := make(fiber.Map)
 	viewModel["Title"] = "Hello, World!"
-	sess, err := sessionStore.Get(c)
-	if err == nil {
-		viewModel["SessId"] = sess.ID()
-	}
 	return c.Render("index", viewModel)
 }
 

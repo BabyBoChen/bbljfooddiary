@@ -7,7 +7,7 @@ let fake = [
     },
 ];
 
-var table = new Tabulator("#example-table", {
+var table = new Tabulator("#tbRank", {
     data: fake,
     height: "311px",
     columns: [

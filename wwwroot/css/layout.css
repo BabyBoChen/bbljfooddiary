@@ -29,6 +29,7 @@ body{
 }
 .navbar-logo {
     font-size: 26px;
+    cursor: pointer;
 }
 .fa-wrapper{
     font-size: 2em;
@@ -55,4 +56,40 @@ body{
     text-align: center;
     font-size: 18px;
     margin: 0px 20px;
+}
+.section-title{
+    color:white;
+    border-bottom: 3px solid green;
+    margin: 20px 20px;
+}
+.index-btn {
+    width: 7.5em;
+    height:4.5em;
+    padding: 8px 15px;
+    background: #3FB449;
+    border: none;
+    border-radius: 10px;
+    color: #202020;
+    font-size: 24px;
+    margin: 10px;
+    cursor: pointer;
+}
+.index-btn:hover {
+    
+}
+.footer {
+    position: relative;
+    text-align: center;
+    padding-top: 10px;
+    border-top: 2px solid green;
+    margin: 0px 20px;
+    margin-top: 20px;
+}
+.footer-item {
+    font-size: 2.5em;
+    color: #3FB449;
+    cursor: pointer;
+}
+.footer-item:hover {
+    color: white;
 }
