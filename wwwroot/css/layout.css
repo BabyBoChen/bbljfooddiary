@@ -17,9 +17,22 @@ body{
     left: 0px;
     right: 0px;
     height: 43px;
+    color: #3FB449;
     background-color: #121212;
     padding: 15px;
     border-bottom: 2px solid green;
+}
+.navbar-logo:hover{
+    color: #25682a;
+}
+.navbar-title{
+    font-weight: bolder;
+}
+.navbar-menu-icon{
+    color: #c4c4c4;
+}
+.navbar-menu-icon:hover{
+    color: #3FB449;
 }
 .v-center {
     position: absolute;
@@ -62,6 +75,10 @@ body{
     border-bottom: 3px solid green;
     margin: 20px 20px;
 }
+#tbTop10Cuisines{
+    max-width: 50em;
+    margin: auto;
+}
 .index-btn {
     width: 7.5em;
     height:4.5em;
@@ -75,7 +92,7 @@ body{
     cursor: pointer;
 }
 .index-btn:hover {
-    
+    background: #25682a;
 }
 .footer {
     position: relative;
@@ -92,4 +109,29 @@ body{
 }
 .footer-item:hover {
     color: white;
+}
+
+/* Tabulator Custom Styles */
+.tabulator {
+    border: 0px;
+}
+.tabulator .tabulator-header .tabulator-col {
+    border-bottom: 3px solid #3FB449;
+    background-color: #0f0f0f !important;
+    color: #fff;
+    font-weight: bold;
+    white-space: nowrap;
+}
+.tabulator-row{
+    color:#ccc;
+    background-color: #121212;
+    border-bottom:1px solid #999;
+}
+.tabulator-row.tabulator-row-even {
+    background-color: #1e1e1e;
+    border-bottom:1px solid #999;
+}
+.tabulator-row:hover{
+    color: white;
+    background-color: #3FB449 !important;
 }

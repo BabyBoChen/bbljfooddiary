@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/BabyBoChen/bbljfooddiary/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/template/html/v2"
@@ -12,8 +13,7 @@ import (
 var sessionStore *session.Store
 
 func index(c *fiber.Ctx) error {
-	viewModel := make(fiber.Map)
-	viewModel["Title"] = "Hello, World!"
+	viewModel := models.NewIndexViewModel()
 	return c.Render("index", viewModel)
 }
 
