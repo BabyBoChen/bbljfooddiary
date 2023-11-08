@@ -1,3 +1,5 @@
 secrets/
 tmp/*
 .vscode
+Dockerfile
+bbljfooddiary.exe

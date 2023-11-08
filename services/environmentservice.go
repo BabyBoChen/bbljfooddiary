@@ -7,6 +7,8 @@ type EnvironmentVariable struct {
 	RefreshToken     string
 	DropboxAppKey    string
 	DropboxAppSecret string
+	Port             string
+	Config           string
 }
 
 func ReadEnvironmentVariables() EnvironmentVariable {
@@ -15,5 +17,7 @@ func ReadEnvironmentVariables() EnvironmentVariable {
 	envVars.RefreshToken = os.Getenv("RefreshToken")
 	envVars.DropboxAppKey = os.Getenv("DropboxAppKey")
 	envVars.DropboxAppSecret = os.Getenv("DropboxAppSecret")
+	envVars.Port = os.Getenv("Port")
+	envVars.Config = os.Getenv("Config")
 	return envVars
 }

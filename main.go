@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/BabyBoChen/bbljfooddiary/models"
+	"github.com/BabyBoChen/bbljfooddiary/services"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/template/html/v2"
@@ -18,11 +20,12 @@ func index(c *fiber.Ctx) error {
 }
 
 func main() {
+	envVars := services.ReadEnvironmentVariables()
 	engine := html.New("./views", ".html")
 	// Reload the templates on each render, good for development
-	engine.Reload(true) // Optional. Default: false
+	engine.Reload(envVars.Config == "debug") // Optional. Default: false
 	// Debug will print each template that is parsed, good for debugging
-	engine.Debug(true) // Optional. Default: false
+	engine.Debug(envVars.Config == "debug") // Optional. Default: false
 
 	sessionStore = session.New()
 
@@ -33,6 +36,5 @@ func main() {
 	app.Static("/", "./wwwroot")
 
 	app.Get("/", index)
-
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(fmt.Sprintf(":%s", envVars.Port)))
 }
