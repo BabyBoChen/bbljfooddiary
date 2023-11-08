@@ -1,7 +1,6 @@
 package services
 
 import (
-	"github.com/BabyBoChen/bbljfooddiary/secrets"
 	"github.com/BabyBoChen/pgdbcontext"
 )
 
@@ -12,7 +11,8 @@ type CuisineService struct {
 func NewCuisineService() (CuisineService, error) {
 	service := CuisineService{}
 	var err error
-	service.db, err = pgdbcontext.NewDbContext(secrets.ConnStr)
+	envVars := ReadEnvironmentVariables()
+	service.db, err = pgdbcontext.NewDbContext(envVars.ConnStr)
 	return service, err
 }
 

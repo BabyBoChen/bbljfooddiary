@@ -13,7 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/BabyBoChen/bbljfooddiary/secrets"
 	"github.com/BabyBoChen/bbljfooddiary/utils"
 )
 
@@ -31,10 +30,11 @@ func NewDropboxClient() (DropboxClient, error) {
 func (dropbox *DropboxClient) getAccessToken() error {
 	endpoint := "https://api.dropboxapi.com/oauth2/token"
 	payload := url.Values{}
+	envVars := ReadEnvironmentVariables()
 	payload.Set("grant_type", "refresh_token")
-	payload.Set("refresh_token", secrets.RefreshToken)
-	payload.Set("client_id", secrets.DropboxAppKey)
-	payload.Set("client_secret", secrets.DropboxAppSecret)
+	payload.Set("refresh_token", envVars.RefreshToken)
+	payload.Set("client_id", envVars.DropboxAppKey)
+	payload.Set("client_secret", envVars.DropboxAppSecret)
 	resp, err := http.Post(endpoint, "application/x-www-form-urlencoded", strings.NewReader(payload.Encode()))
 
 	var resBody []byte
