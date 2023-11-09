@@ -26,6 +26,10 @@ func (service *CuisineService) GetTop10Cuisines() ([]map[string]interface{}, err
 		THEN 'YES'
 		ELSE 'NO'
 		END AS is_one_set
+	,CASE WHEN is_dessert = true
+		THEN '配餐/甜點/飲料'
+		ELSE '主餐'
+		END AS is_dessert
 	,review,last_order_date,restaurant,address,remark
 	FROM public.cuisine
 	ORDER BY review DESC, cuisine_name ASC
