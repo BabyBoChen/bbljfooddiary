@@ -26,10 +26,21 @@
             <div class="index-section">
                 <h2 class="section-title">最高評價排行榜</h2>
             </div>
+            <div class="radio-cuisine-type-wrapper">
+                <label class="lbl-cuisine-type-name" for="rbCuisineMain"><input type="radio" name="cuisine_type_name" id="rbCuisineMain" onchange="rbCuisineChanged(this)" checked/>主餐</label>
+                <label class="lbl-cuisine-type-name" for="rbCuisineDessert"><input type="radio" name="cuisine_type_name" id="rbCuisineDessert" onchange="rbCuisineChanged(this)"/>配餐/飲料/甜點</label>
+                <label class="lbl-cuisine-type-name" for="rbCuisineBuffet"><input type="radio" name="cuisine_type_name" id="rbCuisineBuffet" onchange="rbCuisineChanged(this)"/>無菜單</label>
+            </div>
             <div style="text-align: center; margin: 0px 20px;">
                 <div id="tbTop10Cuisines">
-                    <textarea class="viewbag" id="top10Cuisines">
-                        {{.Top10Cuisines}}
+                    <textarea class="viewbag" id="top10Main">
+                        {{.Top10Main}}
+                    </textarea>
+                    <textarea class="viewbag" id="top10Dessert">
+                        {{.Top10Dessert}}
+                    </textarea>
+                    <textarea class="viewbag" id="top10Buffet">
+                        {{.Top10Buffet}}
                     </textarea>
                 </div>
             </div>
@@ -46,34 +57,38 @@
             <div class="h-center">
                 <button class="index-btn"><i class="fa-solid fa-pen-to-square"></i>新增食記</button>
             </div>
-            <div class="footer">
-                <span class="footer-item">
-                    <i class="fa-brands fa-github"></i>
-                </span>
-                <span class="footer-item">
-                    <i class="fa-brands fa-facebook"></i>
-                </span>
-                <span class="v-center" style="right: 20px;">
-                    BBLJ@2023
-                </span>
-            </div>
+            {{template "partials/footer" .}}
         </div>
         <script>
             /// <reference path="../wwwroot/libs/tabulator-tables/tabulator.min.js"/>
-            let top10Cuisines = [];
+            let rbCuisineMain = document.querySelector("#rbCuisineMain");
+            let rbCuisineDessert = document.querySelector("#rbCuisineDessert");
+            let rbCuisineBuffet = document.querySelector("#rbCuisineBuffet");
+            let top10Main = [];
+            let top10Dessert = [];
+            let top10Buffet = [];
+            let tbTop10Cuisines = null;
+
             window.addEventListener("DOMContentLoaded", function(){
                 /** @type {HTMLTextAreaElement} */
-                let top10Viewbag = document.querySelector(".viewbag#top10Cuisines");
-                top10Cuisines = JSON.parse(top10Viewbag.value);
+                let top10MainViewbag = document.querySelector(".viewbag#top10Main");
+                top10Main = JSON.parse(top10MainViewbag.value);
+                top10MainViewbag.remove();
+                let top10DessertViewbag = document.querySelector(".viewbag#top10Dessert");
+                top10Dessert = JSON.parse(top10DessertViewbag.value);
+                top10DessertViewbag.remove();
+                let top10BuffetViewbag = document.querySelector(".viewbag#top10Buffet");
+                top10Buffet = JSON.parse(top10BuffetViewbag.value);
+                top10BuffetViewbag.remove();
 
-                let tbTop10Cuisines = new Tabulator("#tbTop10Cuisines", {
+                tbTop10Cuisines = new Tabulator("#tbTop10Cuisines", {
                     height: "240px",
-                    data: top10Cuisines,
+                    //data: top10Main,
                     columns: [
                         { title: "餐點名稱", field: "cuisine_name" },
                         { title: "單價", field: "unit_price"},
+                        { title: "類別", field: "cuisine_type_name"},
                         { title: "套餐", field: "is_one_set"},
-                        { title: "類別", field: "is_dessert"},
                         { title: "日期", field: "last_order_date" },
                         { title: "評分", field: "review" },
                         { title: "餐廳", field: "restaurant" },
@@ -82,7 +97,21 @@
                     ],
                 });
 
+                tbTop10Cuisines.on("tableBuilt", function(){
+                    tbTop10Cuisines.setData(top10Main);
+                });
+
             });
+            
+            function rbCuisineChanged(cb){
+                if (cb == rbCuisineMain) {
+                    tbTop10Cuisines.replaceData(top10Main);
+                } else if(cb == rbCuisineDessert) {
+                    tbTop10Cuisines.replaceData(top10Dessert);
+                } else if(cb == rbCuisineBuffet) {
+                    tbTop10Cuisines.replaceData(top10Buffet);
+                }
+            }
         </script>
     </body>
 </html>

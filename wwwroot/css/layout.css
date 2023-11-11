@@ -75,9 +75,21 @@ body{
     border-bottom: 3px solid green;
     margin: 20px 20px;
 }
+.radio-cuisine-type-wrapper{
+    margin: 0px 20px;
+    margin-bottom: 20px;
+    white-space: nowrap;
+    overflow: auto;
+}
+.lbl-cuisine-type-name{
+    margin-right: 10px;
+}
 #tbTop10Cuisines{
     max-width: 700px;
     margin: auto;
+}
+.viewbag{
+    display: none;
 }
 .index-btn {
     width: 7.5em;
@@ -97,7 +109,7 @@ body{
 .footer {
     position: relative;
     text-align: center;
-    padding-top: 10px;
+    padding: 10px 0px;
     border-top: 2px solid green;
     margin: 0px 20px;
     margin-top: 20px;
@@ -105,10 +117,15 @@ body{
 .footer-item {
     font-size: 2.5em;
     color: #3FB449;
+    text-decoration: none;
     cursor: pointer;
 }
 .footer-item:hover {
     color: white;
+    text-decoration: none;
+}
+.footer-item:link, .footer-item:visited, .footer-item:hover, .footer-item:active {
+    text-decoration: none;
 }
 
 /* Tabulator Custom Styles */
