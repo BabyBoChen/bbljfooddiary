@@ -19,6 +19,10 @@ func index(c *fiber.Ctx) error {
 	return c.Render("index", viewModel)
 }
 
+func newCuisine(c *fiber.Ctx) error {
+	return c.Render("newCuisine", nil)
+}
+
 func main() {
 	envVars := services.ReadEnvironmentVariables()
 	engine := html.New("./views", ".html")
@@ -36,5 +40,6 @@ func main() {
 	app.Static("/", "./wwwroot")
 
 	app.Get("/", index)
+	app.Get("/newCuisine", newCuisine)
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", envVars.Port)))
 }

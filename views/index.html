@@ -55,7 +55,9 @@
                 <h2 class="section-title">新增食記</h2>
             </div>
             <div class="h-center">
-                <button class="index-btn"><i class="fa-solid fa-pen-to-square"></i>新增食記</button>
+                <form method="get" action="/newCuisine">
+                    <button class="index-btn"><i class="fa-solid fa-pen-to-square"></i>新增食記</button>
+                </form>
             </div>
             {{template "partials/footer" .}}
         </div>

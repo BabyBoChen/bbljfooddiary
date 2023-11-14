@@ -75,6 +75,9 @@ body{
     border-bottom: 3px solid green;
     margin: 20px 20px;
 }
+.section-body {
+    margin: 20px 20px;
+}
 .radio-cuisine-type-wrapper{
     margin: 0px 20px;
     margin-bottom: 20px;
@@ -126,6 +129,37 @@ body{
 }
 .footer-item:link, .footer-item:visited, .footer-item:hover, .footer-item:active {
     text-decoration: none;
+}
+.btn-primary {
+    background: #3FB449;
+    color: #202020;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.btn-primary:hover {
+    background: #25682a;
+}
+.txt-control {
+    display: block;
+    height: 2em;
+}
+.lbl-control{
+    display: inline-block;
+    font-size: 17px;
+    font-weight: bold;
+    color: #fff;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+.txt-area-control{
+    display: block;
+    width: calc(100% - 10px);
+    height: 7.5em;
+    resize: none;
 }
 
 /* Tabulator Custom Styles */

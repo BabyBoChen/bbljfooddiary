@@ -3,3 +3,4 @@ tmp/*
 .vscode
 Dockerfile
 bbljfooddiary.exe
+db_test.go

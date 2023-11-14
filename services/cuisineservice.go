@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/BabyBoChen/pgdbcontext"
 )
 
@@ -13,6 +15,15 @@ func NewCuisineService() (CuisineService, error) {
 	var err error
 	envVars := ReadEnvironmentVariables()
 	service.db, err = pgdbcontext.NewDbContext(envVars.ConnStr)
+	return service, err
+}
+
+func NewCuisineServiceWithApplicationName(applicationName string) (CuisineService, error) {
+	service := CuisineService{}
+	var err error
+	envVars := ReadEnvironmentVariables()
+	connStr := envVars.ConnStr + " application_name=" + applicationName
+	service.db, err = pgdbcontext.NewDbContext(connStr)
 	return service, err
 }
 
@@ -79,6 +90,16 @@ func (service *CuisineService) GetTop10Cuisines() ([]map[string]interface{}, []m
 	}
 
 	return top10Main, top10Dessert, top10Buffet, err
+}
+
+func (service *CuisineService) GetApplicationName() error {
+	dt, err := service.db.Query("SELECT current_setting('application_name')")
+	if err == nil {
+		for _, row := range dt.Rows {
+			fmt.Println(row.ToMap())
+		}
+	}
+	return err
 }
 
 func toSliceMap(dt *pgdbcontext.DataTable) []map[string]interface{} {
