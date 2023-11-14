@@ -17,16 +17,18 @@ body{
     left: 0px;
     right: 0px;
     height: 43px;
+    font-weight: bolder;
     color: #3FB449;
     background-color: #121212;
     padding: 15px;
     border-bottom: 2px solid green;
 }
+.navbar-logo:link, .navbar-logo:visited, .navbar-logo:hover, .navbar-logo:active {
+    color: #3FB449;
+    text-decoration: none;
+}
 .navbar-logo:hover{
     color: #25682a;
-}
-.navbar-title{
-    font-weight: bolder;
 }
 .navbar-menu-icon{
     color: #c4c4c4;
@@ -88,7 +90,7 @@ body{
     margin-right: 10px;
 }
 #tbTop10Cuisines{
-    max-width: 700px;
+    max-width: 100%;    
     margin: auto;
 }
 .viewbag{
@@ -109,13 +111,24 @@ body{
 .index-btn:hover {
     background: #25682a;
 }
+.padding-bottom {
+    width: 100%;
+    height: 63px;
+}
+.fix-bottom {
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-color: #202020;
+    z-index: 1;
+}
 .footer {
     position: relative;
     text-align: center;
     padding: 10px 0px;
     border-top: 2px solid green;
     margin: 0px 20px;
-    margin-top: 20px;
 }
 .footer-item {
     font-size: 2.5em;
@@ -160,6 +173,13 @@ body{
     width: calc(100% - 10px);
     height: 7.5em;
     resize: none;
+}
+.error-msg {
+    color: red;
+}
+#tbAllCuisine{
+    max-width: 100%;    
+    margin: auto;
 }
 
 /* Tabulator Custom Styles */

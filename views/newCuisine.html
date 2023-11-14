@@ -17,11 +17,11 @@
             <div class="welcome-header">
                 <h1 class="page-title">新增食記</h1>
                 <div class="h-center">
-                    <img src="/assets/food_dummy_250x250.png"/>
+                    <img id="imgCuisineImage" style="width: 250px;height: 250px; object-fit: contain;" src="/assets/food_dummy_250x250.png"/>
                 </div>            
                 <br/>
                 <div class="h-center">
-                    <button class="btn-primary">上傳照片</button>
+                    <button class="btn-primary" onclick="btnUploadClick()"><i class="fa-solid fa-cloud-arrow-up" style="font-size: larger;"></i>&nbsp;上傳照片</button>
                 </div>
             </div>
             <div class="index-section">
@@ -62,20 +62,44 @@
                     <label class="lbl-control" style="vertical-align: top;" for="txtRemark">備註：</label>                    
                     <textarea class="txt-area-control" id="txtRemark" name="Remark" required></textarea>
 
+                    <input type="file" id="fileCuisineImage" name="CuisineImage" style="display: none;" onchange="fileCuisineImageChange(this)"/>
+
                     <div class="h-center">
                         <br/>
                         <button class="btn-primary">新增</button>
                     </div>
                     
                 </form>
-            </div>            
+            </div> 
+            
+            <div class="padding-bottom"></div>
+        </div>
+
+        <div class="fix-bottom">
             {{template "partials/footer" .}}
         </div>
+        
         <script>
             
             window.addEventListener("DOMContentLoaded", function(){
                 
             });
+
+            function btnUploadClick(){
+                /** @type {HTMLInputElement} */
+                let fileCuisineImage = document.getElementById("fileCuisineImage");
+                fileCuisineImage.click();
+            }
+
+            /** @param {HTMLInputElement} fileCuisineImage*/
+            function fileCuisineImageChange(fileCuisineImage){
+                const [file] = fileCuisineImage.files
+                if (file) {
+                    /** @type {HTMLImageElement} */
+                    let imgCuisineImage = document.getElementById("imgCuisineImage");
+                    imgCuisineImage.src = URL.createObjectURL(file)
+                }
+            }
         </script>
     </body>
 </html>

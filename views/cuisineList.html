@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>BBLJ食記</title>
+        <meta name="description" content="BBLJ食記">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="/libs/fontawesome/css/all.min.css" rel="stylesheet">
+        <link href="/libs/tabulator-tables/tabulator.min.css" rel="stylesheet">
+        <script src="/libs/tabulator-tables/tabulator.min.js"></script>
+        <link href="/css/layout.css" rel="stylesheet">
+    </head>
+    <body>
+        {{template "partials/navbar" .}}
+        <div class="site-content">
+            <div class="welcome-header">
+                <div class="h-center">
+                    <img src="/assets/welcome-logo_105x105.png"/>
+                </div>            
+                <h1 class="page-title">食記清單</h1>
+            </div>
+            <div class="index-section">
+                <h2 class="section-title">食記清單</h2>
+            </div>
+            <div style="text-align: center; margin: 0px 20px;">
+                <div id="tbAllCuisine">
+                    <textarea class="viewbag" id="allCuisine">
+                        {{.AllCuisine}}
+                    </textarea>
+                </div>
+            </div>
+            <div class="index-section">
+                <h2 class="section-title">篩選器</h2>
+                <div class="section-body">
+                    <div class="h-center">
+                        <br/>
+                        <button class="btn-primary">套用</button>
+                        <button class="btn-primary">回首頁</button>
+                    </div>
+                </div>
+            </div>
+            <div class="padding-bottom"></div>
+        </div>
+        <div class="fix-bottom">
+            {{template "partials/footer" .}}
+        </div>
+        <script>
+            let allCuisine = [];
+            let tbAllCuisine = null;
+
+            window.addEventListener("DOMContentLoaded", function(){
+                /** @type {HTMLTextAreaElement} */
+                let allCuisineViewbag = document.querySelector(".viewbag#allCuisine");
+                allCuisine = JSON.parse(allCuisineViewbag.value);
+                allCuisineViewbag.remove();                
+
+                tbAllCuisine = new Tabulator("#tbAllCuisine", {
+                    layout:"fitDataTable",
+                    height: "480px",
+                    //data: top10Main,
+                    columns: [
+                        { title: "餐點Id", field: "cuisine_id" },
+                        { title: "餐點名稱", field: "cuisine_name"},
+                        { title: "單價", field: "unit_price"},
+                        { title: "日期", field: "last_order_date"},
+                        { title: "評分", field: "review" },
+                        { title: "餐廳", field: "restaurant" },
+                        { title: "地點", field: "address" },
+                        { title: "備註", field: "remark" },
+                        { title: "套餐", field: "is_one_set" },
+                        { title: "類別", field: "cuisine_type" },
+                    ],
+                });
+
+                tbAllCuisine.on("tableBuilt", function(){
+                    tbAllCuisine.setData(allCuisine);
+                });
+
+            });
+        </script>
+    </body>
+</html>

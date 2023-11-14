@@ -48,7 +48,9 @@
                 <h2 class="section-title">瀏覽食記</h2>
             </div>
             <div class="h-center">
-                <button class="index-btn"><i class="fa-solid fa-list"></i>食記清單</button>
+                <form style="display: inline;" action="/cuisineList" method="get">
+                    <button class="index-btn"><i class="fa-solid fa-list"></i>食記清單</button>
+                </form>
                 <button class="index-btn"><i class="fa-regular fa-calendar-days"></i>食記月曆</button>
             </div>
             <div class="index-section">
@@ -59,6 +61,9 @@
                     <button class="index-btn"><i class="fa-solid fa-pen-to-square"></i>新增食記</button>
                 </form>
             </div>
+            <div class="padding-bottom"></div>
+        </div>
+        <div class="fix-bottom">
             {{template "partials/footer" .}}
         </div>
         <script>
@@ -84,6 +89,7 @@
                 top10BuffetViewbag.remove();
 
                 tbTop10Cuisines = new Tabulator("#tbTop10Cuisines", {
+                    layout:"fitDataTable",
                     height: "240px",
                     //data: top10Main,
                     columns: [
@@ -113,6 +119,7 @@
                 } else if(cb == rbCuisineBuffet) {
                     tbTop10Cuisines.replaceData(top10Buffet);
                 }
+                tbTop10Cuisines.redraw();
             }
         </script>
     </body>

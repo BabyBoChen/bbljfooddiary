@@ -92,6 +92,39 @@ func (service *CuisineService) GetTop10Cuisines() ([]map[string]interface{}, []m
 	return top10Main, top10Dessert, top10Buffet, err
 }
 
+func toSliceMap(dt *pgdbcontext.DataTable) []map[string]interface{} {
+	sliceMap := make([]map[string]interface{}, len(dt.Rows))
+	for i, row := range dt.Rows {
+		rowDict := row.ToMap()
+		sliceMap[i] = rowDict
+	}
+	return sliceMap
+}
+
+func (service *CuisineService) SaveNewCuisine(newCuisine map[string]interface{}) error {
+	repo, err := service.db.GetRepository("cuisine")
+	if err == nil {
+		_, err = repo.Insert(newCuisine)
+	}
+	if err == nil {
+		err = service.db.Commit()
+	}
+
+	return err
+}
+
+func (service *CuisineService) ListAllCuisine() ([]map[string]interface{}, error) {
+	var err error
+	var allCuisine []map[string]interface{}
+	var dt *pgdbcontext.DataTable
+	sql := "SELECT * FROM public.cuisine ORDER BY 1"
+	dt, err = service.db.Query(sql)
+	if err == nil {
+		allCuisine = toSliceMap(dt)
+	}
+	return allCuisine, err
+}
+
 func (service *CuisineService) GetApplicationName() error {
 	dt, err := service.db.Query("SELECT current_setting('application_name')")
 	if err == nil {
@@ -100,15 +133,6 @@ func (service *CuisineService) GetApplicationName() error {
 		}
 	}
 	return err
-}
-
-func toSliceMap(dt *pgdbcontext.DataTable) []map[string]interface{} {
-	sliceMap := make([]map[string]interface{}, len(dt.Rows))
-	for i, row := range dt.Rows {
-		rowDict := row.ToMap()
-		sliceMap[i] = rowDict
-	}
-	return sliceMap
 }
 
 func (service *CuisineService) Dispose() {

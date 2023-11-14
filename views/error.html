@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>BBLJ食記</title>
+        <meta name="description" content="BBLJ食記">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="/libs/fontawesome/css/all.min.css" rel="stylesheet">
+        <link href="/css/layout.css" rel="stylesheet">
+    </head>
+    <body>
+        {{template "partials/navbar" .}}
+        <div class="site-content">
+            <div class="welcome-header">
+                <div class="h-center">
+                    <img src="/assets/warning_105x105.png"/>
+                </div>
+                <h1 class="page-title">Oops!</h1>
+                <div class="welcome-msg">
+                    Something went wrong!
+                </div>
+            </div>
+            <div class="index-section">
+                <h2 class="section-title">錯誤訊息</h2>
+                <div class="error-msg section-body">
+                    {{.ErrorMessage}}
+                </div>
+            </div>
+
+            <form method="get" action="/" class="h-center">
+                <br/>
+                <button class="btn-primary">回首頁</button>
+            </form>
+
+            <div class="padding-bottom"></div>
+        </div>
+        
+        <div class="fix-bottom">
+            {{template "partials/footer" .}}
+        </div>
+
+        <script>
+            
+        </script>
+    </body>
+</html>
