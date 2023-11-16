@@ -9,6 +9,7 @@ import (
 
 	"github.com/BabyBoChen/bbljfooddiary/models"
 	"github.com/BabyBoChen/bbljfooddiary/services"
+	"github.com/BabyBoChen/bbljfooddiary/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/template/html/v2"
@@ -77,7 +78,7 @@ func postNewCuisine(c *fiber.Ctx) error {
 		}
 	}
 
-	var service services.CuisineService
+	var service *services.CuisineService
 	if err == nil {
 		service, err = services.NewCuisineService()
 	}
@@ -112,13 +113,47 @@ func postNewCuisine(c *fiber.Ctx) error {
 	} else {
 		vm := make(models.ErrorViewModel)
 		vm["ErrorMessage"] = err
-		return c.Render("/error", vm)
+		return c.Render("error", vm)
 	}
 }
 
 func cuisineList(c *fiber.Ctx) error {
 	vm := models.NewCuisineListViewModel()
 	return c.Render("cuisineList", vm)
+}
+
+func query(c *fiber.Ctx) error {
+
+	form, err := c.MultipartForm()
+
+	var jsonBody string
+	if err == nil {
+		formData := make(map[string]string)
+		formData["IsKeyword"] = utils.GetValueFromFormData(form.Value, "IsKeyword")
+		formData["Keyword"] = utils.GetValueFromFormData(form.Value, "Keyword")
+		formData["CuisineName"] = utils.GetValueFromFormData(form.Value, "CuisineName")
+		formData["UnitPriceOrder"] = utils.GetValueFromFormData(form.Value, "UnitPriceOrder")
+		formData["CuisineType"] = utils.GetValueFromFormData(form.Value, "CuisineType")
+		formData["LastOrderDate"] = utils.GetValueFromFormData(form.Value, "LastOrderDate")
+		formData["ReviewOrder"] = utils.GetValueFromFormData(form.Value, "ReviewOrder")
+		formData["Restaurant"] = utils.GetValueFromFormData(form.Value, "Restaurant")
+		formData["Address"] = utils.GetValueFromFormData(form.Value, "Address")
+		formData["Remark"] = utils.GetValueFromFormData(form.Value, "Remark")
+		vm := models.NewQueryViewModel(formData)
+		jsonBody, err = vm.Result()
+	}
+
+	if err == nil {
+		return c.SendString(jsonBody)
+	} else {
+		return c.SendString(err.Error())
+	}
+}
+
+func errorPage(c *fiber.Ctx) error {
+	vm := make(models.ErrorViewModel)
+	vm["ErrorMessage"] = "Error page..."
+	return c.Render("error", vm)
 }
 
 func main() {
@@ -146,5 +181,7 @@ func main() {
 	app.Get("/newCuisine", newCuisine)
 	app.Post("/newCuisine", postNewCuisine)
 	app.Get("/cuisineList", cuisineList)
+	app.Post("/query", query)
+	app.Get("/errorPage", errorPage)
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", envVars.Port)))
 }

@@ -60,12 +60,11 @@
                 <form method="get" action="/newCuisine">
                     <button class="index-btn"><i class="fa-solid fa-pen-to-square"></i>新增食記</button>
                 </form>
-            </div>
-            <div class="padding-bottom"></div>
+            </div>            
         </div>
-        <div class="fix-bottom">
-            {{template "partials/footer" .}}
-        </div>
+        <br/>
+        {{template "partials/footer" .}}
+
         <script>
             /// <reference path="../wwwroot/libs/tabulator-tables/tabulator.min.js"/>
             let rbCuisineMain = document.querySelector("#rbCuisineMain");
@@ -91,7 +90,6 @@
                 tbTop10Cuisines = new Tabulator("#tbTop10Cuisines", {
                     layout:"fitDataTable",
                     height: "240px",
-                    //data: top10Main,
                     columns: [
                         { title: "餐點名稱", field: "cuisine_name" },
                         { title: "單價", field: "unit_price"},

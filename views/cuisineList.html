@@ -16,9 +16,65 @@
         <div class="site-content">
             <div class="welcome-header">
                 <div class="h-center">
-                    <img src="/assets/welcome-logo_105x105.png"/>
+                    <img style="width: 105px;" src="/assets/search_250x250.png"/>
                 </div>            
                 <h1 class="page-title">食記清單</h1>
+            </div>
+            <div class="index-section">
+                <h2 class="section-title">篩選器</h2>
+                <form id="frmQuery" class="section-body" style="margin-left: 30px;margin-right: 30px;" method="post" enctype="multipart/form-data">
+                    
+                    <div>
+                        <label class="lbl-control" for="rbIsKeyword1"><input type="radio" name="IsKeyword" id="rbIsKeyword1" value="1" checked onchange="searchModeChange(this)"/>關鍵字查詢</label>
+                    </div>
+                    <label class="lbl-control" for="txtKeyword">關鍵字：</label>                    
+                    <input class="txt-control is-keyword" style="width: 20em;" id="txtKeyword" name="Keyword"/>
+
+                    <div>
+                        <label class="lbl-control" for="rbIsKeyword0"><input type="radio" name="IsKeyword" id="rbIsKeyword0" value="0" onchange="searchModeChange(this)"/>欄位查詢</label>
+                    </div>
+
+                    <label class="lbl-control" for="txtCuisineName">餐點名稱(含)：</label>                    
+                    <input class="txt-control is-not-keyword" style="width: 20em;" id="txtCuisineName" name="CuisineName" disabled/>
+
+                    <label class="lbl-control">單價排序：</label>                    
+                    <div>
+                        <label for="rbUnitPriceOrder0"><input class="is-not-keyword" type="radio" name="UnitPriceOrder" id="rbUnitPriceOrder0" value="0" checked disabled/>無</label>
+                        <label for="rbUnitPriceOrder1"><input class="is-not-keyword" type="radio" name="UnitPriceOrder" id="rbUnitPriceOrder1" value="1" disabled/>升冪</label>
+                        <label for="rbUnitPriceOrder2"><input class="is-not-keyword" type="radio" name="UnitPriceOrder" id="rbUnitPriceOrder2" value="2" disabled/>降冪</label>
+                    </div> 
+
+                    <label class="lbl-control" for="selCuisineType">類別：</label>
+                    <select class="txt-control is-not-keyword" style="width: 10em;"  id="selCuisineType" name="CuisineType" disabled>
+                        <option value="1" selected>主餐</option>
+                        <option value="2">配餐/甜點/飲料</option>
+                        <option value="3">無菜單</option>
+                    </select> 
+
+                    <label class="lbl-control" for="txtLastOrderDate">日期：</label>                    
+                    <input type="date" class="txt-control is-not-keyword" style="width: 20em;" id="txtLastOrderDate" name="LastOrderDate" disabled/>
+
+                    <label class="lbl-control" for="txtKeyword">評分排序：</label>                    
+                    <div>
+                        <label for="rbReviewOrder0"><input class="is-not-keyword" type="radio" name="ReviewOrder" id="rbReviewOrder0" value="0" checked disabled/>無</label>
+                        <label for="rbReviewOrder1"><input class="is-not-keyword" type="radio" name="ReviewOrder" id="rbReviewOrder1" value="1" disabled/>升冪</label>
+                        <label for="rbReviewOrder2"><input class="is-not-keyword" type="radio" name="ReviewOrder" id="rbReviewOrder2" value="2" disabled/>降冪</label>
+                    </div>
+
+                    <label class="lbl-control" for="txtRestaurant">餐聽(含)：</label>                    
+                    <input class="txt-control is-not-keyword" style="width: 20em;" id="txtRestaurant" name="Restaurant" disabled/>
+
+                    <label class="lbl-control" for="txtAddress">地點(含)：</label>                    
+                    <input class="txt-control is-not-keyword" style="width: 20em;" id="txtAddress" name="Address" disabled/>
+
+                    <label class="lbl-control" for="txtRemark">備註(含)：</label>                    
+                    <input class="txt-control is-not-keyword" style="width: 20em;" id="txtRemark" name="Remark" disabled/>
+
+                    <div class="h-center">
+                        <br/>
+                        <button type="button" class="btn-primary" onclick="apply()">套用</button>
+                    </div>        
+                </form>
             </div>
             <div class="index-section">
                 <h2 class="section-title">食記清單</h2>
@@ -30,21 +86,9 @@
                     </textarea>
                 </div>
             </div>
-            <div class="index-section">
-                <h2 class="section-title">篩選器</h2>
-                <div class="section-body">
-                    <div class="h-center">
-                        <br/>
-                        <button class="btn-primary">套用</button>
-                        <button class="btn-primary">回首頁</button>
-                    </div>
-                </div>
-            </div>
-            <div class="padding-bottom"></div>
         </div>
-        <div class="fix-bottom">
-            {{template "partials/footer" .}}
-        </div>
+        <br/>
+        {{template "partials/footer" .}}
         <script>
             let allCuisine = [];
             let tbAllCuisine = null;
@@ -58,18 +102,16 @@
                 tbAllCuisine = new Tabulator("#tbAllCuisine", {
                     layout:"fitDataTable",
                     height: "480px",
-                    //data: top10Main,
                     columns: [
-                        { title: "餐點Id", field: "cuisine_id" },
-                        { title: "餐點名稱", field: "cuisine_name"},
+                        { title: "餐點名稱", field: "cuisine_name" },
                         { title: "單價", field: "unit_price"},
-                        { title: "日期", field: "last_order_date"},
+                        { title: "類別", field: "cuisine_type_name"},
+                        { title: "套餐", field: "is_one_set"},
+                        { title: "日期", field: "last_order_date" },
                         { title: "評分", field: "review" },
                         { title: "餐廳", field: "restaurant" },
                         { title: "地點", field: "address" },
                         { title: "備註", field: "remark" },
-                        { title: "套餐", field: "is_one_set" },
-                        { title: "類別", field: "cuisine_type" },
                     ],
                 });
 
@@ -78,6 +120,47 @@
                 });
 
             });
+            
+            /** @param {HTMLInputElement} rbIsKeyword */
+            function searchModeChange(rbIsKeyword) {
+                if(rbIsKeyword.value == "1"){
+                    document.querySelectorAll(".is-keyword").forEach(/** @param {HTMLInputElement} inp */function(inp){
+                        inp.disabled = false;
+                    });
+                    document.querySelectorAll(".is-not-keyword").forEach(/** @param {HTMLInputElement} inp */function(inp){
+                        inp.disabled = true;
+                    });
+                } else {
+                    document.querySelectorAll(".is-keyword").forEach(/** @param {HTMLInputElement} inp */function(inp){
+                        inp.disabled = true;
+                    });
+                    document.querySelectorAll(".is-not-keyword").forEach(/** @param {HTMLInputElement} inp */function(inp){
+                        inp.disabled = false;
+                    });
+                }
+            }
+
+            async function apply() {
+                tbAllCuisine.clearData();
+                /** @type {HTMLFormElement} */
+                let frmQuery = document.querySelector("#frmQuery");
+                let formData = new FormData(frmQuery);
+                let cuisines = await fetch("/query", {
+                    method: "post",
+                    body: formData,
+                }).then(async function(resp){
+                    if (resp.ok) {
+                        return await resp.json();
+                    }
+                }).catch(function(err){
+                    console.log(err);
+                    return null;
+                });
+                if(cuisines){
+                    tbAllCuisine.setData(cuisines);
+                    tbAllCuisine.redraw();
+                }
+            }
         </script>
     </body>
 </html>
