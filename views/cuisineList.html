@@ -9,6 +9,7 @@
         <link href="/libs/fontawesome/css/all.min.css" rel="stylesheet">
         <link href="/libs/tabulator-tables/tabulator.min.css" rel="stylesheet">
         <script src="/libs/tabulator-tables/tabulator.min.js"></script>
+        <script src="/libs/tabulator-tables/luxon.min.js"></script>
         <link href="/css/layout.css" rel="stylesheet">
     </head>
     <body>
@@ -27,8 +28,14 @@
                     <div>
                         <label class="lbl-control" for="rbIsKeyword1"><input type="radio" name="IsKeyword" id="rbIsKeyword1" value="1" checked onchange="searchModeChange(this)"/>關鍵字查詢</label>
                     </div>
+
                     <label class="lbl-control" for="txtKeyword">關鍵字：</label>                    
                     <input class="txt-control is-keyword" style="width: 20em;" id="txtKeyword" name="Keyword"/>
+
+                    <div class="h-center">
+                        <br/>
+                        <button type="button" class="btn-primary is-keyword" onclick="apply()">套用</button>
+                    </div>
 
                     <div>
                         <label class="lbl-control" for="rbIsKeyword0"><input type="radio" name="IsKeyword" id="rbIsKeyword0" value="0" onchange="searchModeChange(this)"/>欄位查詢</label>
@@ -72,7 +79,7 @@
 
                     <div class="h-center">
                         <br/>
-                        <button type="button" class="btn-primary" onclick="apply()">套用</button>
+                        <button type="button" class="btn-primary is-not-keyword" onclick="apply()" disabled>套用</button>
                     </div>        
                 </form>
             </div>
@@ -86,6 +93,10 @@
                     </textarea>
                 </div>
             </div>
+            <form method="get" action="/" class="h-center">
+                <br/>
+                <button class="btn-primary">回首頁</button>
+            </form>
         </div>
         <br/>
         {{template "partials/footer" .}}
@@ -107,7 +118,16 @@
                         { title: "單價", field: "unit_price"},
                         { title: "類別", field: "cuisine_type_name"},
                         { title: "套餐", field: "is_one_set"},
-                        { title: "日期", field: "last_order_date" },
+                        { 
+                            title: "日期", 
+                            field: "last_order_date", 
+                            formatter: "datetime", 
+                            formatterParams: {
+                                inputFormat:"iso",
+                                outputFormat:"yyyy-MM-dd",
+                                invalidPlaceholder:"",
+                            },
+                        },
                         { title: "評分", field: "review" },
                         { title: "餐廳", field: "restaurant" },
                         { title: "地點", field: "address" },

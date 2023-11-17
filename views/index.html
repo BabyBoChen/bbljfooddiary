@@ -9,6 +9,7 @@
         <link href="/libs/fontawesome/css/all.min.css" rel="stylesheet">
         <link href="/libs/tabulator-tables/tabulator.min.css" rel="stylesheet">
         <script src="/libs/tabulator-tables/tabulator.min.js"></script>
+        <script src="/libs/tabulator-tables/luxon.min.js"></script>
         <link href="/css/layout.css" rel="stylesheet">
     </head>
     <body>
@@ -89,13 +90,22 @@
 
                 tbTop10Cuisines = new Tabulator("#tbTop10Cuisines", {
                     layout:"fitDataTable",
-                    height: "240px",
+                    height: "350px",
                     columns: [
                         { title: "餐點名稱", field: "cuisine_name" },
                         { title: "單價", field: "unit_price"},
                         { title: "類別", field: "cuisine_type_name"},
                         { title: "套餐", field: "is_one_set"},
-                        { title: "日期", field: "last_order_date" },
+                        { 
+                            title: "日期", 
+                            field: "last_order_date", 
+                            formatter: "datetime", 
+                            formatterParams: {
+                                inputFormat:"iso",
+                                outputFormat:"yyyy-MM-dd",
+                                invalidPlaceholder:"",
+                            },
+                        },
                         { title: "評分", field: "review" },
                         { title: "餐廳", field: "restaurant" },
                         { title: "地點", field: "address" },

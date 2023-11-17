@@ -145,8 +145,12 @@ body{
     border-radius: 10px;
     cursor: pointer;
 }
-.btn-primary:hover {
+.btn-primary:hover:enabled {
     background: #25682a;
+}
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor:unset;
 }
 .txt-control {
     display: block;

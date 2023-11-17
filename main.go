@@ -16,7 +16,11 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var sessionStore *session.Store
+func authorize(c *fiber.Ctx) error {
+	vm := make(models.ErrorViewModel)
+	vm["ErrorMessage"] = "forbidden"
+	return c.Render("error", vm)
+}
 
 func index(c *fiber.Ctx) error {
 	viewModel := models.NewIndexViewModel()
@@ -156,6 +160,8 @@ func errorPage(c *fiber.Ctx) error {
 	return c.Render("error", vm)
 }
 
+var sessionStore *session.Store
+
 func main() {
 	envVars := services.ReadEnvironmentVariables()
 	engine := html.New("./views", ".html")
@@ -174,6 +180,8 @@ func main() {
 			return ctx.Render("/error", vm)
 		},
 	})
+
+	app.Use([]string{"/newCuisine"}, authorize)
 
 	app.Static("/", "./wwwroot")
 
