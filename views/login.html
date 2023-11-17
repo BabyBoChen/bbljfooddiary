@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>BBLJ食記</title>
+        <meta name="description" content="BBLJ食記">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="/libs/fontawesome/css/all.min.css" rel="stylesheet">
+        <link href="/css/layout.css" rel="stylesheet">
+    </head>
+    <body>
+        {{template "partials/navbar" .}}
+        <div class="site-content">
+            <div class="welcome-header">
+                <div class="h-center">
+                    <img style="width: 125px;" src="/assets/lock_250x250.png"/>
+                </div>
+                <h1 class="page-title">登入</h1>
+                <div class="welcome-msg">
+                    請輸入通關密語
+                </div>
+            </div>
+            <div class="index-section">
+                <h2 class="section-title"></h2>
+                <form class="section-body" method="post" action="/login" class="h-center" enctype="multipart/form-data">
+                    <label class="lbl-control" for="txtPassword">通關密語：</label>                    
+                    <input class="txt-control" style="width: 20em;" id="txtPassword" name="Password" required/>
+                    <div class="h-center">
+                        <br/>
+                        <button class="btn-primary">登入</button>
+                    </div>
+                </form>
+            </div>
+
+            <br/>
+        </div>
+        
+        {{template "partials/footer" .}}
+
+        <script>
+            
+        </script>
+    </body>
+</html>

@@ -16,12 +16,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func authorize(c *fiber.Ctx) error {
-	vm := make(models.ErrorViewModel)
-	vm["ErrorMessage"] = "forbidden"
-	return c.Render("error", vm)
-}
-
 func index(c *fiber.Ctx) error {
 	viewModel := models.NewIndexViewModel()
 	return c.Render("index", viewModel)
@@ -44,15 +38,15 @@ func postNewCuisine(c *fiber.Ctx) error {
 	var address string
 	var remark string
 	if err == nil {
-		cuisineName = form.Value["CuisineName"][0]
-		unitPrice_str := form.Value["UnitPrice"][0]
-		cuisineType_str := form.Value["CuisineType"][0]
-		isOneSet_str := form.Value["IsOneSet"][0]
-		lastOrderDate_str := form.Value["LastOrderDate"][0]
-		review_str := form.Value["Review"][0]
-		restaurant = form.Value["Restaurant"][0]
-		address = form.Value["Address"][0]
-		remark = form.Value["Remark"][0]
+		cuisineName = utils.GetValueFromFormData(form.Value, "CuisineName")
+		unitPrice_str := utils.GetValueFromFormData(form.Value, "UnitPrice")
+		cuisineType_str := utils.GetValueFromFormData(form.Value, "CuisineType")
+		isOneSet_str := utils.GetValueFromFormData(form.Value, "IsOneSet")
+		lastOrderDate_str := utils.GetValueFromFormData(form.Value, "LastOrderDate")
+		review_str := utils.GetValueFromFormData(form.Value, "Review")
+		restaurant = utils.GetValueFromFormData(form.Value, "Restaurant")
+		address = utils.GetValueFromFormData(form.Value, "Address")
+		remark = utils.GetValueFromFormData(form.Value, "Remark")
 
 		var errType error
 		errMsg := ""
@@ -100,16 +94,6 @@ func postNewCuisine(c *fiber.Ctx) error {
 		newCuisine["is_one_set"] = isOneSet
 		newCuisine["cuisine_type"] = cuisineType
 		err = service.SaveNewCuisine(newCuisine)
-
-		// fmt.Println(cuisineName)
-		// fmt.Println(unitPrice)
-		// fmt.Println(cuisineType)
-		// fmt.Println(isOneSet)
-		// fmt.Println(lastOrderDate)
-		// fmt.Println(review)
-		// fmt.Println(restaurant)
-		// fmt.Println(address)
-		// fmt.Println(remark)
 	}
 
 	if err == nil {
@@ -127,9 +111,7 @@ func cuisineList(c *fiber.Ctx) error {
 }
 
 func query(c *fiber.Ctx) error {
-
 	form, err := c.MultipartForm()
-
 	var jsonBody string
 	if err == nil {
 		formData := make(map[string]string)
@@ -170,8 +152,6 @@ func main() {
 	// Debug will print each template that is parsed, good for debugging
 	engine.Debug(envVars.Config == "debug") // Optional. Default: false
 
-	sessionStore = session.New()
-
 	app := fiber.New(fiber.Config{
 		Views: engine,
 		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
@@ -181,10 +161,9 @@ func main() {
 		},
 	})
 
-	app.Use([]string{"/newCuisine"}, authorize)
-
+	sessionStore = session.New()
+	AuthorizationMiddleware(app)
 	app.Static("/", "./wwwroot")
-
 	app.Get("/", index)
 	app.Get("/newCuisine", newCuisine)
 	app.Post("/newCuisine", postNewCuisine)

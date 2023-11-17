@@ -9,6 +9,7 @@ type EnvironmentVariable struct {
 	DropboxAppSecret string
 	Port             string
 	Config           string
+	Password         string
 }
 
 func ReadEnvironmentVariables() EnvironmentVariable {
@@ -19,5 +20,6 @@ func ReadEnvironmentVariables() EnvironmentVariable {
 	envVars.DropboxAppSecret = os.Getenv("DropboxAppSecret")
 	envVars.Port = os.Getenv("Port")
 	envVars.Config = os.Getenv("Config")
+	envVars.Password = os.Getenv("Password")
 	return envVars
 }
