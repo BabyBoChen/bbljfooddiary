@@ -1,8 +1,9 @@
 package services
 
 import (
+	"errors"
 	"fmt"
-	"strings"
+	"strconv"
 
 	"github.com/BabyBoChen/pgdbcontext"
 )
@@ -28,11 +29,15 @@ func NewCuisineServiceWithApplicationName(applicationName string) (*CuisineServi
 	return &service, err
 }
 
-func (service *CuisineService) GetTop10Cuisines() ([]map[string]interface{}, []map[string]interface{}, []map[string]interface{}, error) {
+type DataSet = map[string][]map[string]interface{}
+
+func (service *CuisineService) GetTop10Cuisines() (DataSet, error) {
 	var err error
+	ds := make(DataSet)
 	var top10Main []map[string]interface{}
 	var top10Dessert []map[string]interface{}
 	var top10Buffet []map[string]interface{}
+	var top10NewCuisine []map[string]interface{}
 
 	var dt *pgdbcontext.DataTable
 	var sql string
@@ -54,6 +59,7 @@ func (service *CuisineService) GetTop10Cuisines() ([]map[string]interface{}, []m
 
 	if err == nil {
 		top10Main = toSliceMap(dt)
+		ds["Top10Main"] = top10Main
 		sql = `
 		SELECT A.cuisine_id, A.cuisine_name, A.unit_price,B.cuisine_type_name
 		,CASE WHEN A.is_one_set = true
@@ -71,6 +77,7 @@ func (service *CuisineService) GetTop10Cuisines() ([]map[string]interface{}, []m
 
 	if err == nil {
 		top10Dessert = toSliceMap(dt)
+		ds["Top10Dessert"] = top10Dessert
 		sql = `
 		SELECT A.cuisine_id, A.cuisine_name, A.unit_price,B.cuisine_type_name
 		,CASE WHEN A.is_one_set = true
@@ -88,9 +95,27 @@ func (service *CuisineService) GetTop10Cuisines() ([]map[string]interface{}, []m
 
 	if err == nil {
 		top10Buffet = toSliceMap(dt)
+		ds["Top10Buffet"] = top10Buffet
+		sql = `
+		SELECT A.cuisine_id, A.cuisine_name, A.unit_price,B.cuisine_type_name
+		,CASE WHEN A.is_one_set = true
+			THEN 'YES'
+			ELSE 'NO'
+			END AS is_one_set
+		,A.review,A.last_order_date,A.restaurant,A.address,A.remark
+		FROM public.cuisine AS A
+		LEFT JOIN public.cuisine_type AS B ON A.cuisine_type=B.cuisine_type_id
+		ORDER BY A.cuisine_id DESC
+		LIMIT 10`
+		dt, err = service.db.Query(sql)
 	}
 
-	return top10Main, top10Dessert, top10Buffet, err
+	if err == nil {
+		top10NewCuisine = toSliceMap(dt)
+		ds["Top10NewCuisine"] = top10NewCuisine
+	}
+
+	return ds, err
 }
 
 func toSliceMap(dt *pgdbcontext.DataTable) []map[string]interface{} {
@@ -171,8 +196,6 @@ func (service *CuisineService) QueryWithKeyword(keyword string) ([]map[string]in
 	sql = fmt.Sprintf(sql, whereSql)
 
 	var dt *pgdbcontext.DataTable
-	keyword = strings.ReplaceAll(keyword, "%", "[%]")
-
 	if len(keyword) > 0 {
 		dt, err = service.db.Query(sql, "%"+keyword+"%")
 	} else {
@@ -183,6 +206,61 @@ func (service *CuisineService) QueryWithKeyword(keyword string) ([]map[string]in
 		results = toSliceMap(dt)
 	}
 	return results, err
+}
+
+//query by fields
+
+func (service *CuisineService) GetCuisineByCuisineId(cuisineId string) (map[string]interface{}, error) {
+	var results map[string]interface{}
+	var err error
+
+	var cid int64
+	cid, err = strconv.ParseInt(cuisineId, 10, 32)
+
+	var dt *pgdbcontext.DataTable
+	if err == nil {
+		sql := `SELECT *
+		FROM public.cuisine
+		WHERE cuisine_id=$1`
+		dt, err = service.db.Query(sql, cid)
+	}
+
+	var arr []map[string]interface{}
+	if err == nil {
+		arr = toSliceMap(dt)
+		if len(arr) == 1 {
+			results = arr[0]
+		} else {
+			err = errors.New("not found")
+		}
+	}
+
+	return results, err
+}
+
+func (service *CuisineService) SaveCuisine(cuisine map[string]interface{}) error {
+	repo, err := service.db.GetRepository("cuisine")
+
+	var dt *pgdbcontext.DataTable
+	if err == nil {
+		dt, err = repo.Select("cuisine_id=$1", cuisine["cuisine_id"])
+	}
+
+	if err == nil {
+		if len(dt.Rows) != 1 {
+			err = errors.New("not found")
+		}
+	}
+
+	if err == nil {
+		err = repo.Update(cuisine)
+	}
+
+	if err == nil {
+		err = service.db.Commit()
+	}
+
+	return err
 }
 
 func (service *CuisineService) Dispose() {

@@ -139,6 +139,10 @@
                     tbAllCuisine.setData(allCuisine);
                 });
 
+                tbAllCuisine.on("rowClick", function(e, row){
+                    let rowData = row.getData();
+                    window.location.href = `/editCuisine?id=${rowData["cuisine_id"]}`;
+                });
             });
             
             /** @param {HTMLInputElement} rbIsKeyword */

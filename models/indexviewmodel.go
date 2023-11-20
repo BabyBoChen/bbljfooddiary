@@ -13,25 +13,27 @@ func NewIndexViewModel() IndexViewModel {
 	vm["Top10Main"] = "[]"
 	vm["Top10Dessert"] = "[]"
 	vm["Top10Buffet"] = "[]"
-	var top10Main []map[string]interface{}
-	var top10Dessert []map[string]interface{}
-	var top10Buffet []map[string]interface{}
+	vm["Top10NewCuisine"] = "[]"
 
+	ds := make(services.DataSet)
 	service, err := services.NewCuisineService()
 	if err == nil {
 		defer service.Dispose()
-		top10Main, top10Dessert, top10Buffet, err = service.GetTop10Cuisines()
+		ds, err = service.GetTop10Cuisines()
 	}
 	if err == nil {
 		var jsonArr []byte
-		jsonArr, _ = json.Marshal(top10Main)
+		jsonArr, _ = json.Marshal(ds["Top10Main"])
 		vm["Top10Main"] = string(jsonArr)
 
-		jsonArr, _ = json.Marshal(top10Dessert)
+		jsonArr, _ = json.Marshal(ds["Top10Dessert"])
 		vm["Top10Dessert"] = string(jsonArr)
 
-		jsonArr, _ = json.Marshal(top10Buffet)
+		jsonArr, _ = json.Marshal(ds["Top10Buffet"])
 		vm["Top10Buffet"] = string(jsonArr)
+
+		jsonArr, _ = json.Marshal(ds["Top10NewCuisine"])
+		vm["Top10NewCuisine"] = string(jsonArr)
 	}
 	return vm
 }

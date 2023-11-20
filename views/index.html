@@ -31,6 +31,7 @@
                 <label class="lbl-cuisine-type-name" for="rbCuisineMain"><input type="radio" name="cuisine_type_name" id="rbCuisineMain" onchange="rbCuisineChanged(this)" checked/>主餐</label>
                 <label class="lbl-cuisine-type-name" for="rbCuisineDessert"><input type="radio" name="cuisine_type_name" id="rbCuisineDessert" onchange="rbCuisineChanged(this)"/>配餐/飲料/甜點</label>
                 <label class="lbl-cuisine-type-name" for="rbCuisineBuffet"><input type="radio" name="cuisine_type_name" id="rbCuisineBuffet" onchange="rbCuisineChanged(this)"/>無菜單</label>
+                <label class="lbl-cuisine-type-name" for="rbCuisineNewCuisine"><input type="radio" name="cuisine_type_name" id="rbCuisineNewCuisine" onchange="rbCuisineChanged(this)"/>近期新增</label>
             </div>
             <div style="text-align: center; margin: 0px 20px;">
                 <div id="tbTop10Cuisines">
@@ -42,6 +43,9 @@
                     </textarea>
                     <textarea class="viewbag" id="top10Buffet">
                         {{.Top10Buffet}}
+                    </textarea>
+                    <textarea class="viewbag" id="top10NewCuisine">
+                        {{.Top10NewCuisine}}
                     </textarea>
                 </div>
             </div>
@@ -71,9 +75,11 @@
             let rbCuisineMain = document.querySelector("#rbCuisineMain");
             let rbCuisineDessert = document.querySelector("#rbCuisineDessert");
             let rbCuisineBuffet = document.querySelector("#rbCuisineBuffet");
+            let rbCuisineNewCuisine = document.querySelector("#rbCuisineNewCuisine");
             let top10Main = [];
             let top10Dessert = [];
             let top10Buffet = [];
+            let top10NewCuisine = [];
             let tbTop10Cuisines = null;
 
             window.addEventListener("DOMContentLoaded", function(){
@@ -87,6 +93,9 @@
                 let top10BuffetViewbag = document.querySelector(".viewbag#top10Buffet");
                 top10Buffet = JSON.parse(top10BuffetViewbag.value);
                 top10BuffetViewbag.remove();
+                let top10NewCuisineViewbag = document.querySelector(".viewbag#top10NewCuisine");
+                top10NewCuisine = JSON.parse(top10NewCuisineViewbag.value);
+                top10NewCuisineViewbag.remove();
 
                 tbTop10Cuisines = new Tabulator("#tbTop10Cuisines", {
                     layout:"fitDataTable",
@@ -117,6 +126,10 @@
                     tbTop10Cuisines.setData(top10Main);
                 });
 
+                tbTop10Cuisines.on("rowClick", function(e, row){
+                    let rowData = row.getData();
+                    window.location.href = `/editCuisine?id=${rowData["cuisine_id"]}`;
+                });
             });
             
             function rbCuisineChanged(cb){
@@ -126,6 +139,8 @@
                     tbTop10Cuisines.replaceData(top10Dessert);
                 } else if(cb == rbCuisineBuffet) {
                     tbTop10Cuisines.replaceData(top10Buffet);
+                } else if(cb == rbCuisineNewCuisine){
+                    tbTop10Cuisines.replaceData(top10NewCuisine);
                 }
                 tbTop10Cuisines.redraw();
             }

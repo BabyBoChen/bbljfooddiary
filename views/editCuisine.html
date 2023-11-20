@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>BBLJ食記</title>
+        <meta name="description" content="BBLJ食記">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="/libs/fontawesome/css/all.min.css" rel="stylesheet">
+        <!-- <link href="/libs/tabulator-tables/tabulator.min.css" rel="stylesheet">
+        <script src="/libs/tabulator-tables/tabulator.min.js"></script> -->
+        <link href="/css/layout.css" rel="stylesheet">
+    </head>
+    <body>
+        {{template "partials/navbar" .}}
+        <div class="site-content">
+            <div class="welcome-header">
+                <h1 class="page-title">編輯食記</h1>
+                <div class="h-center">
+                    <img id="imgCuisineImage" style="width: 250px;height: 250px; object-fit: contain;" src="/assets/food_dummy_250x250.png"/>
+                </div>            
+                <br/>
+                <div class="h-center">
+                    <button class="btn-primary" onclick="btnUploadClick()"><i class="fa-solid fa-cloud-arrow-up" style="font-size: larger;"></i>&nbsp;上傳照片</button>
+                </div>
+            </div>
+            <div class="index-section">
+                <h2 class="section-title">食記內容</h2>
+                <form class="section-body" style="margin-left: 30px;margin-right: 30px;" action="/editCuisine" method="post" enctype="multipart/form-data">
+                    
+                    <label class="lbl-control" for="txtCuisineName" style="margin-top: 0px;">餐點名稱：</label>                    
+                    <input class="txt-control" style="width: 20em;" id="txtCuisineName" name="CuisineName" value='{{.cuisine_name}}' required/>
+                    
+                    <label class="lbl-control" for="txtUnitPrice">單價(NTD)：</label>
+                    <input type="number" class="txt-control" style="width: 7.5em;" id="txtUnitPrice" name="UnitPrice" value='{{.unit_price}}' required/>
+                    
+                    <label class="lbl-control" for="selCuisineType">類別：</label>
+                    <select class="txt-control" style="width: 10em;" id="selCuisineType" name="CuisineType">
+                        <option value="1" {{.cuisine_type1}}>主餐</option>
+                        <option value="2" {{.cuisine_type2}}>配餐/甜點/飲料</option>
+                        <option value="3" {{.cuisine_type3}}>無菜單</option>
+                    </select>
+                    
+                    <label class="lbl-control">套餐：</label>                    
+                    <div>
+                        <label for="rbIsOneSet1"><input type="radio" name="IsOneSet" id="rbIsOneSet1" value="1" {{.is_one_set1}}/>是</label>
+                        <label for="rbIsOneSet0"><input type="radio" name="IsOneSet" id="rbIsOneSet0" value="0" {{.is_one_set0}}/>否</label>
+                    </div>                    
+                    
+                    <label class="lbl-control" for="dateLastOrderDate">日期：</label>                    
+                    <input type="date" class="txt-control" id="dateLastOrderDate" name="LastOrderDate" value="{{.last_order_date}}" required/>
+                    
+                    <label class="lbl-control" for="txtReview">評分(0~100)：</label>                    
+                    <input type="number" class="txt-control" style="width: 7.5em;" id="txtReview" name="Review" min="0" max="100" step="1" value="{{.review}}" required/>
+                    
+                    <label class="lbl-control" for="txtRestaurant">餐廰：</label>                    
+                    <input class="txt-control" style="width: 20em;" id="txtRestaurant" name="Restaurant" value="{{.restaurant}}" required/>
+                    
+                    <label class="lbl-control" for="txtAddress">地點：</label>                    
+                    <input class="txt-control" style="width: 20em;" id="txtAddress" name="Address" value="{{.address}}" required/>
+                    
+                    <label class="lbl-control" style="vertical-align: top;" for="txtRemark">備註：</label>                    
+                    <textarea class="txt-area-control" id="txtRemark" name="Remark">{{.remark}}</textarea>
+
+                    <input type="file" id="fileCuisineImage" name="CuisineImage" style="display: none;" onchange="fileCuisineImageChange(this)"/>
+                    <input type="hidden" name="CuisineId" value="{{.cuisine_id}}"/>
+
+                    <div class="h-center">
+                        <br/>
+                        <button class="btn-primary">儲存</button>
+                    </div>
+                    
+                </form>
+            </div> 
+        </div>
+
+        {{template "partials/footer" .}}
+        <textarea style="display: none;">{{.CuisineMap}}</textarea>
+        
+        <script>
+            
+            window.addEventListener("DOMContentLoaded", function(){
+                
+            });
+
+            function btnUploadClick(){
+                /** @type {HTMLInputElement} */
+                let fileCuisineImage = document.getElementById("fileCuisineImage");
+                fileCuisineImage.click();
+            }
+
+            /** @param {HTMLInputElement} fileCuisineImage*/
+            function fileCuisineImageChange(fileCuisineImage){
+                const [file] = fileCuisineImage.files
+                if (file) {
+                    /** @type {HTMLImageElement} */
+                    let imgCuisineImage = document.getElementById("imgCuisineImage");
+                    imgCuisineImage.src = URL.createObjectURL(file)
+                }
+            }
+        </script>
+    </body>
+</html>
