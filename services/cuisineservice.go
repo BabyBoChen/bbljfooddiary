@@ -263,6 +263,38 @@ func (service *CuisineService) SaveCuisine(cuisine map[string]interface{}) error
 	return err
 }
 
+func (service *CuisineService) DeleteCuisine(cuisineId string) error {
+	repo, err := service.db.GetRepository("cuisine")
+
+	var id int64
+	if err == nil {
+		id, err = strconv.ParseInt(cuisineId, 10, 64)
+	}
+
+	var dt *pgdbcontext.DataTable
+	if err == nil {
+		dt, err = repo.Select("cuisine_id=$1", id)
+	}
+
+	if err == nil {
+		if len(dt.Rows) != 1 {
+			err = errors.New("not found")
+		}
+	}
+
+	if err == nil {
+		key := make(map[string]interface{})
+		key["cuisine_id"] = id
+		err = repo.Delete(key)
+	}
+
+	if err == nil {
+		err = service.db.Commit()
+	}
+
+	return err
+}
+
 func (service *CuisineService) Dispose() {
 	if service.db != nil {
 		service.db.Dispose()

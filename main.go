@@ -47,6 +47,7 @@ func main() {
 	app.Post("/login", postLogin)
 	app.Get("/editCuisine", editCuisine)
 	app.Post("/editCuisine", postEditCuisine)
+	app.Get("/deleteCuisine", deleteCuisine)
 	app.Get("/errorPage", errorPage)
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", envVars.Port)))
 }
@@ -310,6 +311,34 @@ func postEditCuisine(c *fiber.Ctx) error {
 		newCuisine["is_one_set"] = isOneSet
 		newCuisine["cuisine_type"] = cuisineType
 		err = service.SaveCuisine(newCuisine)
+	}
+
+	if err == nil {
+		return c.Redirect("/")
+	} else {
+		vm := make(models.ErrorViewModel)
+		vm["ErrorMessage"] = err
+		return c.Render("error", vm)
+	}
+}
+
+func deleteCuisine(c *fiber.Ctx) error {
+	var err error
+	q := c.Queries()
+	if utils.MapContainsKey(q, "id") {
+
+	} else {
+		err = errors.New("not found")
+	}
+
+	var service *services.CuisineService
+	if err == nil {
+		service, err = services.NewCuisineService()
+	}
+
+	if err == nil {
+		defer service.Dispose()
+		err = service.DeleteCuisine(q["id"])
 	}
 
 	if err == nil {

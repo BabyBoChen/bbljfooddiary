@@ -63,11 +63,12 @@
                     <textarea class="txt-area-control" id="txtRemark" name="Remark">{{.remark}}</textarea>
 
                     <input type="file" id="fileCuisineImage" name="CuisineImage" style="display: none;" onchange="fileCuisineImageChange(this)"/>
-                    <input type="hidden" name="CuisineId" value="{{.cuisine_id}}"/>
+                    <input type="hidden" id="cuisineId" name="CuisineId" value="{{.cuisine_id}}"/>
 
                     <div class="h-center">
                         <br/>
-                        <button class="btn-primary">儲存</button>
+                        <button class="btn-primary" style="margin-right: 10px;">儲存</button>
+                        <button type="button" class="btn-primary" style="margin-left: 10px;" onclick="deleteCuisine()">刪除&nbsp;<i class="fa-solid fa-trash"></i></button>
                     </div>
                     
                 </form>
@@ -76,6 +77,7 @@
 
         {{template "partials/footer" .}}
         <textarea style="display: none;">{{.CuisineMap}}</textarea>
+        <input type="hidden" id="txtHiddenName" value='{{.cuisine_name}}'/>
         
         <script>
             
@@ -96,6 +98,14 @@
                     /** @type {HTMLImageElement} */
                     let imgCuisineImage = document.getElementById("imgCuisineImage");
                     imgCuisineImage.src = URL.createObjectURL(file)
+                }
+            }
+
+            async function deleteCuisine(){
+                let cuisineName = document.getElementById("txtHiddenName")?.value;
+                if(confirm(`確定要刪除食記「${cuisineName}」？`)) {
+                    let cuisineId = document.getElementById("cuisineId").value;
+                    window.location.href = `/deleteCuisine?id=${cuisineId}`;
                 }
             }
         </script>
