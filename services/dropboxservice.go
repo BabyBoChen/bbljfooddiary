@@ -20,11 +20,11 @@ type DropboxClient struct {
 	accessToken string
 }
 
-func NewDropboxClient() (DropboxClient, error) {
+func NewDropboxClient() (*DropboxClient, error) {
 	var dropbox DropboxClient
 	err := dropbox.getAccessToken()
 	//fmt.Println(dropbox.accessToken)
-	return dropbox, err
+	return &dropbox, err
 }
 
 func (dropbox *DropboxClient) getAccessToken() error {

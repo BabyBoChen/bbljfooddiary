@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func ResizeImage(img image.Image, ext string, maxWidth int) string {
+func ResizeImage(img image.Image, ext string, maxWidth int) (string, error) {
 	w := img.Bounds().Dx()
 	h := img.Bounds().Dy()
 	var comp *image.NRGBA
@@ -28,6 +28,6 @@ func ResizeImage(img image.Image, ext string, maxWidth int) string {
 		ext = "." + ext
 	}
 	newFileName := fmt.Sprintf("./tmp/%s%s", uid.String(), ext)
-	imaging.Save(comp, newFileName)
-	return newFileName
+	err := imaging.Save(comp, newFileName)
+	return newFileName, err
 }

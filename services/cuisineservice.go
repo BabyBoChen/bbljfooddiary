@@ -3,8 +3,12 @@ package services
 import (
 	"errors"
 	"fmt"
+	"image"
+	"io"
+	"os"
 	"strconv"
 
+	"github.com/BabyBoChen/bbljfooddiary/utils"
 	"github.com/BabyBoChen/pgdbcontext"
 )
 
@@ -127,15 +131,42 @@ func toSliceMap(dt *pgdbcontext.DataTable) []map[string]interface{} {
 	return sliceMap
 }
 
-func (service *CuisineService) SaveNewCuisine(newCuisine map[string]interface{}) error {
+func (service *CuisineService) SaveNewCuisine(newCuisine map[string]interface{}, cuisineImage io.Reader) error {
 	repo, err := service.db.GetRepository("cuisine")
+
+	var lastInsertedId map[string]interface{}
 	if err == nil {
-		_, err = repo.Insert(newCuisine)
+		lastInsertedId, err = repo.Insert(newCuisine)
+	}
+	if cuisineImage != nil {
+		var dpClient *DropboxClient
+		if err == nil {
+			dpClient, err = NewDropboxClient()
+		}
+		var tmpImgPath string
+		if err == nil {
+			img, ext, _ := image.Decode(cuisineImage)
+			tmpImgPath, err = utils.ResizeImage(img, ext, 800)
+		}
+		var tmpImg *os.File
+		if err == nil {
+			tmpImg, err = os.Open(tmpImgPath)
+		}
+		if err == nil {
+			id, ok := lastInsertedId["cuisine_id"].(int64)
+			if ok {
+				id_str := fmt.Sprintf("%d", id)
+				_, err = dpClient.UploadFile("/"+id_str, tmpImg)
+			} else {
+				err = errors.New("cannot upload image")
+			}
+			tmpImg.Close()
+			os.Remove(tmpImgPath)
+		}
 	}
 	if err == nil {
 		err = service.db.Commit()
 	}
-
 	return err
 }
 
