@@ -315,30 +315,32 @@ func (service *CuisineService) SaveCuisine(cuisine map[string]interface{}, cuisi
 	}
 
 	if err == nil {
-		var dpClient *DropboxClient
-		if err == nil {
-			dpClient, err = NewDropboxClient()
-		}
-		var img image.Image
-		var ext string
-		if err == nil {
-			img, ext, err = image.Decode(cuisineImage)
-		}
-		var tmpImgPath string
-		if err == nil {
-			tmpImgPath, err = utils.ResizeImage(img, ext, 800)
-		}
-		var tmpImg *os.File
-		if err == nil {
-			tmpImg, err = os.Open(tmpImgPath)
-		}
-		var folderPath string
-		if err == nil {
-			folderPath = fmt.Sprintf("/%d", cuisine["cuisine_id"])
-			_, err = dpClient.UploadFile(folderPath, "CuisineImage.png", tmpImg)
-		}
-		if err == nil {
-			_, err = dpClient.CreateSharedLink(folderPath + "/CuisineImage.png")
+		if cuisineImage != nil {
+			var dpClient *DropboxClient
+			if err == nil {
+				dpClient, err = NewDropboxClient()
+			}
+			var img image.Image
+			var ext string
+			if err == nil {
+				img, ext, err = image.Decode(cuisineImage)
+			}
+			var tmpImgPath string
+			if err == nil {
+				tmpImgPath, err = utils.ResizeImage(img, ext, 800)
+			}
+			var tmpImg *os.File
+			if err == nil {
+				tmpImg, err = os.Open(tmpImgPath)
+			}
+			var folderPath string
+			if err == nil {
+				folderPath = fmt.Sprintf("/%d", cuisine["cuisine_id"])
+				_, err = dpClient.UploadFile(folderPath, "CuisineImage.png", tmpImg)
+			}
+			if err == nil {
+				dpClient.CreateSharedLink(folderPath + "/CuisineImage.png")
+			}
 		}
 	}
 

@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -22,6 +23,7 @@ type DropboxClient struct {
 func NewDropboxClient() (*DropboxClient, error) {
 	var dropbox DropboxClient
 	err := dropbox.getAccessToken()
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	//fmt.Println(dropbox.accessToken)
 	return &dropbox, err
 }
