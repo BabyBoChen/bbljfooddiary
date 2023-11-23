@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"os"
 	"testing"
@@ -11,5 +12,6 @@ import (
 func TestImageCo(t *testing.T) {
 	f, _ := os.Open("./tmp/1699016250179.jpg")
 	img, ext, _ := image.Decode(f)
-	utils.ResizeImage(img, ext, 800)
+	saveFileName := fmt.Sprintf("test.%s", ext)
+	utils.ResizeImage(img, saveFileName, 800)
 }

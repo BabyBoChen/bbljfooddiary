@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -69,7 +68,7 @@ func (dropbox *DropboxClient) getAccessToken() error {
 //	size:233769
 //
 // ]
-func (dropbox *DropboxClient) UploadFile(folderPath string, f *os.File) (map[string]interface{}, error) {
+func (dropbox *DropboxClient) UploadFile(folderPath string, fileName string, f *os.File) (map[string]interface{}, error) {
 	var respJson map[string]interface{}
 
 	urlPath := "https://content.dropboxapi.com/2/files/upload"
@@ -81,7 +80,7 @@ func (dropbox *DropboxClient) UploadFile(folderPath string, f *os.File) (map[str
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", dropbox.accessToken))
 		req.Header.Set("Content-Type", "application/octet-stream")
 		args := make(map[string]interface{})
-		args["path"] = folderPath + "/" + filepath.Base(f.Name())
+		args["path"] = folderPath + "/" + fileName
 		mode := make(map[string]interface{})
 		mode[".tag"] = "overwrite"
 		args["mode"] = mode

@@ -143,25 +143,35 @@ func (service *CuisineService) SaveNewCuisine(newCuisine map[string]interface{},
 		if err == nil {
 			dpClient, err = NewDropboxClient()
 		}
+		var img image.Image
+		var ext string
+		if err == nil {
+			img, ext, err = image.Decode(cuisineImage)
+		}
 		var tmpImgPath string
 		if err == nil {
-			img, ext, _ := image.Decode(cuisineImage)
 			tmpImgPath, err = utils.ResizeImage(img, ext, 800)
 		}
 		var tmpImg *os.File
 		if err == nil {
 			tmpImg, err = os.Open(tmpImgPath)
 		}
+		var id int64
+		ok := false
+		var id_str string
 		if err == nil {
-			id, ok := lastInsertedId["cuisine_id"].(int64)
+			defer os.Remove(tmpImgPath)
+			defer tmpImg.Close()
+			id, ok = lastInsertedId["cuisine_id"].(int64)
 			if ok {
-				id_str := fmt.Sprintf("%d", id)
-				_, err = dpClient.UploadFile("/"+id_str, tmpImg)
+				id_str = fmt.Sprintf("%d", id)
+				_, err = dpClient.UploadFile("/"+id_str, "CuisineImage.png", tmpImg)
 			} else {
 				err = errors.New("cannot upload image")
 			}
-			tmpImg.Close()
-			os.Remove(tmpImgPath)
+		}
+		if err == nil {
+			_, err = dpClient.CreateSharedLink("/" + id_str + "/CuisineImage.png")
 		}
 	}
 	if err == nil {
@@ -266,10 +276,27 @@ func (service *CuisineService) GetCuisineByCuisineId(cuisineId string) (map[stri
 		}
 	}
 
+	if err == nil {
+		results["CuisineImageUrl"] = "/assets/food_dummy_250x250.png"
+		dpClient, err2 := NewDropboxClient()
+		var urls []string
+		if err2 == nil {
+			urls, err2 = dpClient.GetSharedLink("/" + cuisineId + "/CuisineImage.png")
+		}
+		if err2 == nil {
+			if len(urls) <= 0 {
+				err2 = errors.New("shared link not found")
+			}
+		}
+		if err2 == nil {
+			results["CuisineImageUrl"] = urls[0] + "&raw=1"
+		}
+	}
+
 	return results, err
 }
 
-func (service *CuisineService) SaveCuisine(cuisine map[string]interface{}) error {
+func (service *CuisineService) SaveCuisine(cuisine map[string]interface{}, cuisineImage io.Reader) error {
 	repo, err := service.db.GetRepository("cuisine")
 
 	var dt *pgdbcontext.DataTable
@@ -285,6 +312,34 @@ func (service *CuisineService) SaveCuisine(cuisine map[string]interface{}) error
 
 	if err == nil {
 		err = repo.Update(cuisine)
+	}
+
+	if err == nil {
+		var dpClient *DropboxClient
+		if err == nil {
+			dpClient, err = NewDropboxClient()
+		}
+		var img image.Image
+		var ext string
+		if err == nil {
+			img, ext, err = image.Decode(cuisineImage)
+		}
+		var tmpImgPath string
+		if err == nil {
+			tmpImgPath, err = utils.ResizeImage(img, ext, 800)
+		}
+		var tmpImg *os.File
+		if err == nil {
+			tmpImg, err = os.Open(tmpImgPath)
+		}
+		var folderPath string
+		if err == nil {
+			folderPath = fmt.Sprintf("/%d", cuisine["cuisine_id"])
+			_, err = dpClient.UploadFile(folderPath, "CuisineImage.png", tmpImg)
+		}
+		if err == nil {
+			_, err = dpClient.CreateSharedLink(folderPath + "/CuisineImage.png")
+		}
 	}
 
 	if err == nil {

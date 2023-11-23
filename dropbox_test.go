@@ -23,7 +23,7 @@ func TestUpload(t *testing.T) {
 	imgs[5] = "./tmp/1699016250179 (5th copy).jpg"
 	for _, fn := range imgs {
 		f, _ := os.Open(fn)
-		resp, _ := dropbox.UploadFile("/testupload", f)
+		resp, _ := dropbox.UploadFile("/testupload", "test.png", f)
 		path := resp["path_lower"].(string)
 		dropbox.CreateSharedLink(path)
 	}

@@ -304,6 +304,16 @@ func postEditCuisine(c *fiber.Ctx) error {
 		}
 	}
 
+	var header *multipart.FileHeader
+	var cuisineImage io.Reader = nil
+	if err == nil {
+		var noImageError error
+		header, noImageError = c.FormFile("CuisineImage")
+		if noImageError == nil {
+			cuisineImage, err = header.Open()
+		}
+	}
+
 	var service *services.CuisineService
 	if err == nil {
 		service, err = services.NewCuisineService()
@@ -322,7 +332,7 @@ func postEditCuisine(c *fiber.Ctx) error {
 		newCuisine["remark"] = remark
 		newCuisine["is_one_set"] = isOneSet
 		newCuisine["cuisine_type"] = cuisineType
-		err = service.SaveCuisine(newCuisine)
+		err = service.SaveCuisine(newCuisine, cuisineImage)
 	}
 
 	if err == nil {
