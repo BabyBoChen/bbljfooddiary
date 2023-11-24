@@ -22,8 +22,8 @@ type DropboxClient struct {
 
 func NewDropboxClient() (*DropboxClient, error) {
 	var dropbox DropboxClient
-	err := dropbox.getAccessToken()
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	err := dropbox.getAccessToken()
 	//fmt.Println(dropbox.accessToken)
 	return &dropbox, err
 }
