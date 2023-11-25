@@ -50,6 +50,7 @@ func main() {
 	app.Get("/editCuisine", editCuisine)
 	app.Post("/editCuisine", postEditCuisine)
 	app.Get("/deleteCuisine", deleteCuisine)
+	app.Get("/clearCache", clearCache)
 	app.Get("/errorPage", errorPage)
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", envVars.Port)))
 }
@@ -370,6 +371,12 @@ func deleteCuisine(c *fiber.Ctx) error {
 		vm["ErrorMessage"] = err
 		return c.Render("error", vm)
 	}
+}
+
+func clearCache(c *fiber.Ctx) error {
+	services.ClearCache()
+
+	return c.Redirect("/")
 }
 
 func errorPage(c *fiber.Ctx) error {

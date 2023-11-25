@@ -8,7 +8,7 @@ import (
 )
 
 func AuthorizationMiddleware(app *fiber.App) {
-	app.Use([]string{"/newCuisine", "/editCuisine", "/deleteCuisine"}, authorize)
+	app.Use([]string{"/newCuisine", "/editCuisine", "/deleteCuisine", "/clearCache"}, authorize)
 }
 
 func authorize(c *fiber.Ctx) error {

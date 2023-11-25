@@ -170,14 +170,28 @@ func (service *CuisineService) SaveNewCuisine(newCuisine map[string]interface{},
 				err = errors.New("cannot upload image")
 			}
 		}
+		var resp map[string]interface{}
 		if err == nil {
-			_, err = dpClient.CreateSharedLink("/" + id_str + "/CuisineImage.png")
+			resp, err = dpClient.CreateSharedLink("/" + id_str + "/CuisineImage.png")
+		}
+		if err == nil {
+			service.putCacheCuisineImageUrl(id_str, resp["url"].(string))
 		}
 	}
 	if err == nil {
 		err = service.db.Commit()
 	}
 	return err
+}
+
+var cacheCuisineImageUrl map[string]string
+
+func (service *CuisineService) putCacheCuisineImageUrl(cuisineId string, sharedLink string) {
+	if cacheCuisineImageUrl == nil {
+		cacheCuisineImageUrl = make(map[string]string)
+	}
+	key := fmt.Sprintf("k_%s", cuisineId)
+	cacheCuisineImageUrl[key] = sharedLink
 }
 
 func (service *CuisineService) ListAllCuisine() ([]map[string]interface{}, error) {
@@ -249,7 +263,7 @@ func (service *CuisineService) QueryWithKeyword(keyword string) ([]map[string]in
 	return results, err
 }
 
-//query by fields
+//TODO query by fields
 
 func (service *CuisineService) GetCuisineByCuisineId(cuisineId string) (map[string]interface{}, error) {
 	var results map[string]interface{}
@@ -277,23 +291,58 @@ func (service *CuisineService) GetCuisineByCuisineId(cuisineId string) (map[stri
 	}
 
 	if err == nil {
-		results["CuisineImageUrl"] = "/assets/food_dummy_250x250.png"
-		dpClient, err2 := NewDropboxClient()
-		var urls []string
-		if err2 == nil {
-			urls, err2 = dpClient.GetSharedLink("/" + cuisineId + "/CuisineImage.png")
-		}
-		if err2 == nil {
-			if len(urls) <= 0 {
-				err2 = errors.New("shared link not found")
-			}
-		}
-		if err2 == nil {
-			results["CuisineImageUrl"] = urls[0] + "&raw=1"
-		}
+		results["CuisineImageUrl"], _ = service.getCuisimeImageUrl(cuisineId)
 	}
 
 	return results, err
+}
+
+func (service *CuisineService) getCuisimeImageUrl(cuisineId string) (string, error) {
+	var cuisineImageUrl string
+	var err error
+
+	//search from cached urls
+	cuisineImageUrl, err = service.getCacheCuisineImageUrl(cuisineId)
+	if err == nil && len(cuisineImageUrl) > 0 {
+		cuisineImageUrl = cuisineImageUrl + "&raw=1"
+	} else {
+		//get url from dropbox service
+		var dpClient *DropboxClient
+		err = nil
+
+		dpClient, err = NewDropboxClient()
+		var urls []string
+		if err == nil {
+			urls, err = dpClient.GetSharedLink("/" + cuisineId + "/CuisineImage.png")
+		}
+
+		if err == nil {
+			if len(urls) >= 1 {
+				cuisineImageUrl = urls[0]
+				service.putCacheCuisineImageUrl(cuisineId, cuisineImageUrl) //put into cache
+				cuisineImageUrl = cuisineImageUrl + "&raw=1"
+			} else {
+				err = errors.New("shared link not found")
+			}
+		}
+	}
+
+	return cuisineImageUrl, err
+}
+
+func (service *CuisineService) getCacheCuisineImageUrl(cuisineId string) (string, error) {
+	var sharedLink string = "/assets/food_dummy_250x250.png"
+	var err error
+	if cacheCuisineImageUrl == nil {
+		cacheCuisineImageUrl = make(map[string]string)
+	}
+	key := fmt.Sprintf("k_%s", cuisineId)
+	if utils.MapContainsKey[string](cacheCuisineImageUrl, key) {
+		sharedLink = cacheCuisineImageUrl[key]
+	} else {
+		err = errors.New("url not found")
+	}
+	return sharedLink, err
 }
 
 func (service *CuisineService) SaveCuisine(cuisine map[string]interface{}, cuisineImage io.Reader) error {
@@ -387,4 +436,8 @@ func (service *CuisineService) Dispose() {
 	if service.db != nil {
 		service.db.Dispose()
 	}
+}
+
+func ClearCache() {
+	cacheCuisineImageUrl = make(map[string]string)
 }
