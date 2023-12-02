@@ -19,6 +19,10 @@ body{
     padding: 15px;
     border-bottom: 2px solid green;
 }
+.navbar-logo {
+    font-size: 26px;
+    cursor: pointer;
+}
 .navbar-logo:link, .navbar-logo:visited, .navbar-logo:hover, .navbar-logo:active {
     color: #3FB449;
     text-decoration: none;
@@ -29,6 +33,10 @@ body{
 .navbar-menu-icon{
     color: #c4c4c4;
 }
+.navbar-menu-icon:link, .navbar-menu-icon:visited, .navbar-menu-icon:hover, .navbar-menu-icon:active {
+    color: #c4c4c4;
+    text-decoration: none;
+}
 .navbar-menu-icon:hover{
     color: #3FB449;
 }
@@ -38,12 +46,60 @@ body{
     -ms-transform: translateY(-50%); 
     transform: translateY(-50%);
 }
-.navbar-logo {
-    font-size: 26px;
-    cursor: pointer;
-}
 .fa-wrapper{
     font-size: 2em;
+}
+.navbar-menu-link-wrapper {
+    display: none;
+    position: absolute;
+    right: 15px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+@media screen and (min-width: 576px) {
+    .navbar-menu-icon {
+        display: none;
+    }
+    .navbar-menu-link-wrapper{
+        display: inline;
+    }
+}
+.navbar-menu-link {
+    font-size: 18px;
+    font-weight: bolder;
+    color: #c4c4c4;
+    margin: 0px 5px;
+}
+.navbar-menu-link:link, .navbar-menu-link:visited, .navbar-menu-link:hover, .navbar-menu-link:active {
+    color: #c4c4c4;
+    text-decoration: none;
+}
+.navbar-menu-link:hover{
+    color: #3FB449;
+}
+dialog {
+    width: 30em;
+    height: 18em;
+    background-color: #222;
+    padding: 0px;
+}
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+}
+.menu-dialog-link {
+    display: block;
+    font-size: 26px;
+    font-weight: bolder;
+    color: white;
+    padding: 10px 20px;
+    border-bottom: 1px solid #4b4b4b;
+}
+.menu-dialog-link:link, .menu-dialog-link:visited, .menu-dialog-link:hover, .menu-dialog-link:active {
+    color: white;
+    text-decoration: none;
+}
+.menu-dialog-link:hover {
+    color: #3FB449;
 }
 .site-content{
     min-height:calc(100% - 132px);

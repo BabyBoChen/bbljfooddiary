@@ -8,7 +8,7 @@ import (
 )
 
 func AuthorizationMiddleware(app *fiber.App) {
-	app.Use([]string{"/newCuisine", "/editCuisine", "/deleteCuisine", "/clearCache"}, authorize)
+	app.Use([]string{"/newCuisine", "/saveCuisine", "/deleteCuisine", "/clearCache"}, authorize)
 }
 
 func authorize(c *fiber.Ctx) error {
@@ -36,4 +36,16 @@ func authorize(c *fiber.Ctx) error {
 		sess.Save()
 		return c.Redirect("/login")
 	}
+}
+
+func IsLogin(c *fiber.Ctx) bool {
+	isAuthorized := false
+	sess, err := sessionStore.Get(c)
+	if err == nil {
+		isAuthorizedSess := sess.Get("isAuthorized")
+		if isAuthorizedSess == true {
+			isAuthorized = true
+		}
+	}
+	return isAuthorized
 }

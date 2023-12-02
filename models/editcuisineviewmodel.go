@@ -49,6 +49,7 @@ func NewEditCuisineViewModel(cuisine_id string) (EditCuisineViewModel, error) {
 	if err == nil {
 		vm = cuisine
 		vm["CuisineMap"] = string(cuisine_json)
+		vm["IsLogin"] = false
 	}
 
 	return vm, err

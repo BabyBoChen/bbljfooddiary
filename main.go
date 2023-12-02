@@ -48,7 +48,10 @@ func main() {
 	app.Get("/login", login)
 	app.Post("/login", postLogin)
 	app.Get("/editCuisine", editCuisine)
-	app.Post("/editCuisine", postEditCuisine)
+	app.Get("/saveCuisine", func(c *fiber.Ctx) error {
+		return c.Redirect("/")
+	})
+	app.Post("/saveCuisine", saveCuisine)
 	app.Get("/deleteCuisine", deleteCuisine)
 	app.Get("/clearCache", clearCache)
 	app.Get("/errorPage", errorPage)
@@ -240,6 +243,14 @@ func editCuisine(c *fiber.Ctx) error {
 	}
 
 	if err == nil {
+		if IsLogin(c) {
+			vm["IsLogin"] = ""
+		} else {
+			vm["IsLogin"] = "disabled"
+		}
+	}
+
+	if err == nil {
 		return c.Render("editCuisine", vm)
 	} else {
 		vm := make(models.ErrorViewModel)
@@ -248,8 +259,15 @@ func editCuisine(c *fiber.Ctx) error {
 	}
 }
 
-func postEditCuisine(c *fiber.Ctx) error {
+func saveCuisine(c *fiber.Ctx) error {
 	form, err := c.MultipartForm()
+
+	if err == nil {
+		isAuthorized := IsLogin(c)
+		if !isAuthorized {
+			err = errors.New("unauthorized")
+		}
+	}
 
 	var cuisineId int64
 	var cuisineName string
@@ -337,7 +355,7 @@ func postEditCuisine(c *fiber.Ctx) error {
 	}
 
 	if err == nil {
-		return c.Redirect("/")
+		return c.Redirect(fmt.Sprintf("/editCuisine?id=%d", cuisineId))
 	} else {
 		vm := make(models.ErrorViewModel)
 		vm["ErrorMessage"] = err

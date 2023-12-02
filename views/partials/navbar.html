@@ -5,7 +5,39 @@
             BBLJ食記
         </span>
     </a>
-    <span class="navbar-menu-icon fa-wrapper v-center" style="width:1.25em;right:15px;cursor: pointer;">
+    <span 
+        class="navbar-menu-icon fa-wrapper v-center" 
+        style="width:1.25em;right:15px;cursor: pointer;"
+        onclick="(function(){
+            /** @type {HTMLDialogElement}*/
+            let dialog = document.getElementById('menuDialog');
+            dialog.showModal();
+            dialog.focus();
+        })()">
         <i class="fa-solid fa-bars"></i>
     </span>
+    <span class="navbar-menu-link-wrapper v-center">
+        <a class="navbar-menu-link" href="/newCuisine">新增食記</a>
+        <a class="navbar-menu-link" href="/cuisineList">食記清單</a>
+        <a class="navbar-menu-link" href="/login">登入</a>
+    </span>
+    <dialog id="menuDialog" onclick="(function(){
+            /** @type {HTMLDialogElement}*/
+            let dialog = document.getElementById('menuDialog');
+            if(event.target == dialog){
+                dialog.close();
+            }
+        })()">
+        <div><a class="menu-dialog-link" href="/newCuisine">新增食記</a></div>
+        <div><a class="menu-dialog-link" href="/cuisineList">食記清單</a></div>
+        <div><a class="menu-dialog-link" href="/login">登入</a></div>
+        <div class="h-center" style="padding-top: 15px;">
+            <a class="footer-item" href="https://github.com/BabyBoChen/bbljfooddiary" target="_blank">
+                <i class="fa-brands fa-github"></i>
+            </a>
+            <a class="footer-item" href="" target="_blank">
+                <i class="fa-brands fa-facebook"></i>
+            </a>
+        </div>
+    </dialog>
 </div>
