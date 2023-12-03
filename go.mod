@@ -27,6 +27,6 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/gofiber/fiber/v2 v2.50.0
 	github.com/gofiber/template/html/v2 v2.0.5
-	github.com/google/uuid v1.4.0 // indirect
+	github.com/google/uuid v1.4.0
 	github.com/h2non/bimg v1.1.9
 )

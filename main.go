@@ -219,6 +219,7 @@ func postLogin(c *fiber.Ctx) error {
 			err = sess.Save()
 		} else {
 			err = errors.New("unauthorized")
+			sess.Save()
 		}
 	}
 
