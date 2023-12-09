@@ -6,6 +6,7 @@
         <title>BBLJ食記</title>
         <meta name="description" content="BBLJ食記">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        {{template "partials/favicon" .}}
         <link href="/libs/fontawesome/css/all.min.css" rel="stylesheet">
         <link href="/libs/tabulator-tables/tabulator.min.css" rel="stylesheet">
         <script src="/libs/tabulator-tables/tabulator.min.js"></script>
@@ -56,7 +57,7 @@
                 <form style="display: inline;" action="/cuisineList" method="get">
                     <button class="index-btn"><i class="fa-solid fa-list"></i>食記清單</button>
                 </form>
-                <button class="index-btn"><i class="fa-regular fa-calendar-days"></i>食記月曆</button>
+                <!-- <button class="index-btn"><i class="fa-regular fa-calendar-days"></i>食記月曆</button> -->
             </div>
             <div class="index-section">
                 <h2 class="section-title">新增食記</h2>

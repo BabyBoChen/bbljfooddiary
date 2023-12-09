@@ -28,6 +28,12 @@ func (vm *QueryViewModel) Result() (string, error) {
 			defer service.Dispose()
 			result, err = service.QueryWithKeyword(vm.formData["Keyword"])
 		}
+	} else {
+		service, err = services.NewCuisineService()
+		if err == nil {
+			defer service.Dispose()
+			result, err = service.QueryWithFields(vm.formData)
+		}
 	}
 
 	var jb []byte

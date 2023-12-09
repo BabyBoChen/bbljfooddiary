@@ -173,6 +173,7 @@ func query(c *fiber.Ctx) error {
 		formData["UnitPriceOrder"] = utils.GetValueFromFormData(form.Value, "UnitPriceOrder")
 		formData["CuisineType"] = utils.GetValueFromFormData(form.Value, "CuisineType")
 		formData["LastOrderDate"] = utils.GetValueFromFormData(form.Value, "LastOrderDate")
+		formData["LastOrderDateTo"] = utils.GetValueFromFormData(form.Value, "LastOrderDateTo")
 		formData["ReviewOrder"] = utils.GetValueFromFormData(form.Value, "ReviewOrder")
 		formData["Restaurant"] = utils.GetValueFromFormData(form.Value, "Restaurant")
 		formData["Address"] = utils.GetValueFromFormData(form.Value, "Address")

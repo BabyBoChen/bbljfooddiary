@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/BabyBoChen/bbljfooddiary/utils"
 	"github.com/BabyBoChen/pgdbcontext"
@@ -263,7 +264,142 @@ func (service *CuisineService) QueryWithKeyword(keyword string) ([]map[string]in
 	return results, err
 }
 
-//TODO query by fields
+func (service *CuisineService) QueryWithFields(formData map[string]string) ([]map[string]interface{}, error) {
+	var results []map[string]interface{}
+	var err error
+
+	sql := `WITH VI_Cuisine AS 
+	(
+		SELECT A.cuisine_id, A.cuisine_name, A.unit_price,B.cuisine_type_name
+		,CASE WHEN A.is_one_set = true
+			THEN 'YES'
+			ELSE 'NO'
+			END AS is_one_set
+		,A.review,A.last_order_date,A.restaurant,A.address,A.remark
+		,A.cuisine_type
+		FROM public.cuisine AS A
+		LEFT JOIN public.cuisine_type AS B ON A.cuisine_type=B.cuisine_type_id
+	)
+	SELECT *
+	FROM VI_Cuisine
+	WHERE %s
+	ORDER BY %s last_order_date DESC`
+
+	whereSql := "1=1"
+	paramIndex := "$1"
+	parameters := make([]interface{}, 0)
+	if utils.MapContainsKey[string](formData, "CuisineName") && len(formData["CuisineName"]) > 0 {
+		whereSql += fmt.Sprintf(" AND cuisine_name LIKE " + paramIndex)
+		parameters = append(parameters, "%"+formData["CuisineName"]+"%")
+		paramIndex = "$" + fmt.Sprintf("%d", len(parameters)+1)
+	}
+	cuisineTypes := map[string]int{
+		"1": 1,
+		"2": 2,
+		"3": 3,
+	}
+	if utils.MapContainsKey[string](formData, "CuisineType") && utils.MapContainsKey[int](cuisineTypes, formData["CuisineType"]) {
+		whereSql += fmt.Sprintf(" AND cuisine_type=" + paramIndex)
+		parameters = append(parameters, cuisineTypes[formData["CuisineType"]])
+		paramIndex = "$" + fmt.Sprintf("%d", len(parameters)+1)
+	}
+	hasLastOrderDate := false
+	var lastOrderDate time.Time
+	hasLastOrderDateTo := false
+	var lastOrderDateTo time.Time
+	if utils.MapContainsKey[string](formData, "LastOrderDate") && len(formData["LastOrderDate"]) > 0 {
+		lastOrderDate_str := formData["LastOrderDate"]
+		lastOrderDate, err = time.Parse("2006-01-02", lastOrderDate_str)
+		if err == nil {
+			hasLastOrderDate = true
+		}
+	}
+	if err == nil {
+		if utils.MapContainsKey[string](formData, "LastOrderDateTo") && len(formData["LastOrderDateTo"]) > 0 {
+			lastOrderDateTo_str := formData["LastOrderDateTo"]
+			lastOrderDateTo, err = time.Parse("2006-01-02", lastOrderDateTo_str)
+			if err == nil {
+				hasLastOrderDateTo = true
+			}
+		}
+	}
+	if err == nil {
+		if hasLastOrderDate && hasLastOrderDateTo {
+			dateRange := make([]time.Time, 2)
+			if lastOrderDate.Compare(lastOrderDateTo) <= 0 {
+				dateRange[0] = lastOrderDate
+				dateRange[1] = lastOrderDateTo
+			} else {
+				dateRange[0] = lastOrderDateTo
+				dateRange[1] = lastOrderDate
+			}
+			whereSql += " AND last_order_date >= " + paramIndex
+			parameters = append(parameters, dateRange[0])
+			paramIndex = "$" + fmt.Sprintf("%d", len(parameters)+1)
+			whereSql += " AND last_order_date <= " + paramIndex
+			parameters = append(parameters, dateRange[1])
+			paramIndex = "$" + fmt.Sprintf("%d", len(parameters)+1)
+		} else if hasLastOrderDate {
+			whereSql += " AND last_order_date = " + paramIndex
+			parameters = append(parameters, lastOrderDate)
+			paramIndex = "$" + fmt.Sprintf("%d", len(parameters)+1)
+		}
+	}
+	if err == nil {
+		if utils.MapContainsKey[string](formData, "Restaurant") && len(formData["Restaurant"]) > 0 {
+			whereSql += fmt.Sprintf(" AND restaurant LIKE " + paramIndex)
+			parameters = append(parameters, "%"+formData["Restaurant"]+"%")
+			paramIndex = "$" + fmt.Sprintf("%d", len(parameters)+1)
+		}
+	}
+	if err == nil {
+		if utils.MapContainsKey[string](formData, "Address") && len(formData["Address"]) > 0 {
+			whereSql += fmt.Sprintf(" AND restaurant LIKE " + paramIndex)
+			parameters = append(parameters, "%"+formData["Address"]+"%")
+			paramIndex = "$" + fmt.Sprintf("%d", len(parameters)+1)
+		}
+	}
+	if err == nil {
+		if utils.MapContainsKey[string](formData, "Remark") && len(formData["Remark"]) > 0 {
+			whereSql += fmt.Sprintf(" AND restaurant LIKE " + paramIndex)
+			parameters = append(parameters, "%"+formData["Remark"]+"%")
+			paramIndex = "$" + fmt.Sprintf("%d", len(parameters)+1)
+		}
+	}
+	orderBySql := ""
+	ord := map[string]string{
+		"0": "0",
+		"1": "1",
+		"2": "2",
+	}
+	if err == nil {
+		if utils.MapContainsKey[string](formData, "UnitPriceOrder") && formData["UnitPriceOrder"] != "0" && utils.MapContainsKey[string](ord, formData["UnitPriceOrder"]) {
+			if formData["UnitPriceOrder"] == "1" {
+				orderBySql += "unit_price ASC, "
+			} else {
+				orderBySql += "unit_price DESC, "
+			}
+		}
+	}
+	if err == nil {
+		if utils.MapContainsKey[string](formData, "ReviewOrder") && formData["ReviewOrder"] != "0" && utils.MapContainsKey[string](ord, formData["ReviewOrder"]) {
+			if formData["ReviewOrder"] == "1" {
+				orderBySql += "review ASC, "
+			} else {
+				orderBySql += "review DESC, "
+			}
+		}
+	}
+	sql = fmt.Sprintf(sql, whereSql, orderBySql)
+	var dt *pgdbcontext.DataTable
+	if err == nil {
+		dt, err = service.db.Query(sql, parameters...)
+	}
+	if err == nil {
+		results = toSliceMap(dt)
+	}
+	return results, err
+}
 
 func (service *CuisineService) GetCuisineByCuisineId(cuisineId string) (map[string]interface{}, error) {
 	var results map[string]interface{}

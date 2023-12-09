@@ -6,6 +6,7 @@
         <title>BBLJ食記</title>
         <meta name="description" content="BBLJ食記">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        {{template "partials/favicon" .}}
         <link href="/libs/fontawesome/css/all.min.css" rel="stylesheet">
         <link href="/libs/tabulator-tables/tabulator.min.css" rel="stylesheet">
         <script src="/libs/tabulator-tables/tabulator.min.js"></script>
@@ -34,7 +35,8 @@
 
                     <div class="h-center">
                         <br/>
-                        <button type="button" class="btn-primary is-keyword" onclick="apply()">套用</button>
+                        <button type="button" class="btn-primary is-keyword" style="margin-right: 10px;" onclick="apply()">套用</button>
+                        <button type="button" class="btn-primary is-keyword" style="margin-left: 10px;" onclick="resetForm(this)">清除</button>
                     </div>
 
                     <div>
@@ -61,6 +63,9 @@
                     <label class="lbl-control" for="txtLastOrderDate">日期：</label>                    
                     <input type="date" class="txt-control is-not-keyword" style="width: 20em;" id="txtLastOrderDate" name="LastOrderDate" disabled/>
 
+                    <label class="lbl-control" for="txtLastOrderDateTo">日期(到)：</label>                    
+                    <input type="date" class="txt-control is-not-keyword" style="width: 20em;" id="txtLastOrderDateTo" name="LastOrderDateTo" disabled/>
+
                     <label class="lbl-control" for="txtKeyword">評分排序：</label>                    
                     <div>
                         <label for="rbReviewOrder0"><input class="is-not-keyword" type="radio" name="ReviewOrder" id="rbReviewOrder0" value="0" checked disabled/>無</label>
@@ -79,7 +84,8 @@
 
                     <div class="h-center">
                         <br/>
-                        <button type="button" class="btn-primary is-not-keyword" onclick="apply()" disabled>套用</button>
+                        <button type="button" class="btn-primary is-not-keyword" style="margin-right: 10px;" onclick="apply()" disabled>套用</button>
+                        <button type="button" class="btn-primary is-not-keyword" style="margin-left: 10px;" onclick="resetForm(this)" disabled>清除</button>
                     </div>        
                 </form>
             </div>
@@ -183,6 +189,22 @@
                 if(cuisines){
                     tbAllCuisine.setData(cuisines);
                     tbAllCuisine.redraw();
+                }
+            }
+
+            /** @param {HTMLButtonElement} btn */
+            function resetForm(btn) {
+                document.getElementById("frmQuery").reset();
+                /** @type {HTMLInputElement} */
+                let rbIsKeyword1 = document.getElementById("rbIsKeyword1");
+                /** @type {HTMLInputElement} */
+                let rbIsKeyword0 = document.getElementById("rbIsKeyword0");
+                if (btn.classList.contains("is-keyword")) {
+                    rbIsKeyword0.checked = false;
+                    rbIsKeyword1.checked = true;
+                } else if(btn.classList.contains("is-not-keyword")) {
+                    rbIsKeyword0.checked = true;
+                    rbIsKeyword1.checked = false;
                 }
             }
         </script>
