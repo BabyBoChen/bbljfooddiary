@@ -129,8 +129,9 @@ dialog::backdrop {
     margin: 20px 20px;
 }
 .radio-cuisine-type-wrapper{
+    padding-bottom: 15px;
     margin: 0px 20px;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
     white-space: nowrap;
     overflow: auto;
 }

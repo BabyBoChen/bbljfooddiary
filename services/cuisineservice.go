@@ -354,14 +354,14 @@ func (service *CuisineService) QueryWithFields(formData map[string]string) ([]ma
 	}
 	if err == nil {
 		if utils.MapContainsKey[string](formData, "Address") && len(formData["Address"]) > 0 {
-			whereSql += fmt.Sprintf(" AND restaurant LIKE " + paramIndex)
+			whereSql += fmt.Sprintf(" AND address LIKE " + paramIndex)
 			parameters = append(parameters, "%"+formData["Address"]+"%")
 			paramIndex = "$" + fmt.Sprintf("%d", len(parameters)+1)
 		}
 	}
 	if err == nil {
 		if utils.MapContainsKey[string](formData, "Remark") && len(formData["Remark"]) > 0 {
-			whereSql += fmt.Sprintf(" AND restaurant LIKE " + paramIndex)
+			whereSql += fmt.Sprintf(" AND remark LIKE " + paramIndex)
 			parameters = append(parameters, "%"+formData["Remark"]+"%")
 			paramIndex = "$" + fmt.Sprintf("%d", len(parameters)+1)
 		}
@@ -520,6 +520,7 @@ func (service *CuisineService) SaveCuisine(cuisine map[string]interface{}, cuisi
 			}
 			var folderPath string
 			if err == nil {
+				defer os.Remove(tmpImgPath)
 				folderPath = fmt.Sprintf("/%d", cuisine["cuisine_id"])
 				_, err = dpClient.UploadFile(folderPath, "CuisineImage.png", tmpImg)
 			}
