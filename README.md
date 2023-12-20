@@ -1,1 +1,8 @@
-readme
+# BBLJ食記
+
+「BBLJ食記」記錄了BBLJ團隊平日外食的地點、餐點價格以及評價，供有興趣的朋友們參考。
+
+「BBLJ食記」是以Golang語言、基於fiber框架編寫而成的一個網站作品，並包裝成Docker映像部署於免費的CaaS平台ScaleDynamics上。
+
+網站連結：
+https://bbljfooddiary.scaledynamics.cloud/
