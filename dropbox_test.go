@@ -31,7 +31,7 @@ func TestUpload(t *testing.T) {
 
 func TestListFolder(t *testing.T) {
 	dropbox, _ := services.NewDropboxClient()
-	ls, _ := dropbox.ListFolder("/testupload")
+	ls, _ := dropbox.ListFolder("/56")
 	fmt.Println(ls)
 }
 
