@@ -4,5 +4,7 @@
 
 「BBLJ食記」是以Golang語言、基於fiber框架編寫而成的一個網站作品，並包裝成Docker映像部署於免費的CaaS平台ScaleDynamics上。
 
+本站也採用了Neon的Postgres資料庫以及Dropbox雲端硬碟作為後端的資料儲存解決方案。
+
 網站連結：
 https://bbljfooddiary.scaledynamics.cloud/
