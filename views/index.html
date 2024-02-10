@@ -29,13 +29,16 @@
                 <h2 class="section-title">食記排行榜</h2>
             </div>
             <div class="radio-cuisine-type-wrapper">
-                <label class="lbl-cuisine-type-name" for="rbCuisineMain"><input type="radio" name="cuisine_type_name" id="rbCuisineMain" onchange="rbCuisineChanged(this)" checked/>主餐</label>
-                <label class="lbl-cuisine-type-name" for="rbCuisineDessert"><input type="radio" name="cuisine_type_name" id="rbCuisineDessert" onchange="rbCuisineChanged(this)"/>配餐/飲料/甜點</label>
-                <label class="lbl-cuisine-type-name" for="rbCuisineBuffet"><input type="radio" name="cuisine_type_name" id="rbCuisineBuffet" onchange="rbCuisineChanged(this)"/>無菜單</label>
-                <label class="lbl-cuisine-type-name" for="rbCuisineNewCuisine"><input type="radio" name="cuisine_type_name" id="rbCuisineNewCuisine" onchange="rbCuisineChanged(this)"/>近期新增</label>
+                <label class="lbl-cuisine-type-name" for="rbCuisineNewCuisine"><input type="radio" name="cuisine_type_name" id="rbCuisineNewCuisine" onchange="rbCuisineChanged(this)" checked autocomplete="off"/>近期新增</label>
+                <label class="lbl-cuisine-type-name" for="rbCuisineMain"><input type="radio" name="cuisine_type_name" id="rbCuisineMain" onchange="rbCuisineChanged(this)" autocomplete="off"/>主餐</label>
+                <label class="lbl-cuisine-type-name" for="rbCuisineDessert"><input type="radio" name="cuisine_type_name" id="rbCuisineDessert" onchange="rbCuisineChanged(this)" autocomplete="off"/>配餐/飲料/甜點</label>
+                <label class="lbl-cuisine-type-name" for="rbCuisineBuffet"><input type="radio" name="cuisine_type_name" id="rbCuisineBuffet" onchange="rbCuisineChanged(this)" autocomplete="off"/>無菜單</label>
             </div>
             <div style="text-align: center; margin: 0px 20px;">
                 <div id="tbTop10Cuisines">
+                    <textarea class="viewbag" id="top10NewCuisine">
+                        {{.Top10NewCuisine}}
+                    </textarea>
                     <textarea class="viewbag" id="top10Main">
                         {{.Top10Main}}
                     </textarea>
@@ -44,9 +47,6 @@
                     </textarea>
                     <textarea class="viewbag" id="top10Buffet">
                         {{.Top10Buffet}}
-                    </textarea>
-                    <textarea class="viewbag" id="top10NewCuisine">
-                        {{.Top10NewCuisine}}
                     </textarea>
                 </div>
             </div>
@@ -85,18 +85,21 @@
 
             window.addEventListener("DOMContentLoaded", function(){
                 /** @type {HTMLTextAreaElement} */
-                let top10MainViewbag = document.querySelector(".viewbag#top10Main");
-                top10Main = JSON.parse(top10MainViewbag.value);
-                top10MainViewbag.remove();
-                let top10DessertViewbag = document.querySelector(".viewbag#top10Dessert");
-                top10Dessert = JSON.parse(top10DessertViewbag.value);
-                top10DessertViewbag.remove();
-                let top10BuffetViewbag = document.querySelector(".viewbag#top10Buffet");
-                top10Buffet = JSON.parse(top10BuffetViewbag.value);
-                top10BuffetViewbag.remove();
                 let top10NewCuisineViewbag = document.querySelector(".viewbag#top10NewCuisine");
                 top10NewCuisine = JSON.parse(top10NewCuisineViewbag.value);
                 top10NewCuisineViewbag.remove();
+                /** @type {HTMLTextAreaElement} */
+                let top10MainViewbag = document.querySelector(".viewbag#top10Main");
+                top10Main = JSON.parse(top10MainViewbag.value);
+                top10MainViewbag.remove();
+                /** @type {HTMLTextAreaElement} */
+                let top10DessertViewbag = document.querySelector(".viewbag#top10Dessert");
+                top10Dessert = JSON.parse(top10DessertViewbag.value);
+                top10DessertViewbag.remove();
+                /** @type {HTMLTextAreaElement} */
+                let top10BuffetViewbag = document.querySelector(".viewbag#top10Buffet");
+                top10Buffet = JSON.parse(top10BuffetViewbag.value);
+                top10BuffetViewbag.remove();                
 
                 tbTop10Cuisines = new Tabulator("#tbTop10Cuisines", {
                     layout:"fitDataTable",
@@ -124,7 +127,7 @@
                 });
 
                 tbTop10Cuisines.on("tableBuilt", function(){
-                    tbTop10Cuisines.setData(top10Main);
+                    tbTop10Cuisines.setData(top10NewCuisine);
                 });
 
                 tbTop10Cuisines.on("rowClick", function(e, row){

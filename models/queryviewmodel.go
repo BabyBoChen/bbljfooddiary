@@ -17,7 +17,7 @@ func NewQueryViewModel(formData map[string]string) *QueryViewModel {
 }
 
 func (vm *QueryViewModel) Result() (string, error) {
-	jsonBody := "[]"
+	jsonBody := "{\"allCuisines:\"[],\"formData\":\"\"}"
 	var err error
 
 	var service *services.CuisineService
@@ -38,7 +38,10 @@ func (vm *QueryViewModel) Result() (string, error) {
 
 	var jb []byte
 	if err == nil {
-		jb, err = json.Marshal(result)
+		jsonObj := make(map[string]interface{})
+		jsonObj["allCuisines"] = result
+		jsonObj["formData"] = vm.formData
+		jb, err = json.Marshal(jsonObj)
 	}
 
 	if err == nil {

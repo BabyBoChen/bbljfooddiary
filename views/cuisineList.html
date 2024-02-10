@@ -98,6 +98,14 @@
                         {{.AllCuisine}}
                     </textarea>
                 </div>
+                <div>
+                    <form method="post" enctype="multipart/form-data" action="/page">
+                        <button type="button" class="btn-primary">上一頁</button>
+                        <input id="txtPage" name="page" class="txt-control" style="width:3em;display: inline;"/><label id="spanPageCnt" class="lbl-control">/0</label>
+                        <button type="button" class="btn-primary">下一頁</button>
+                        <input type="hidden" name="Filter"/>
+                    </form>
+                </div>
             </div>
             <form method="get" action="/" class="h-center">
                 <br/>
