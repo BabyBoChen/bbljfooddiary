@@ -178,6 +178,24 @@ func query(c *fiber.Ctx) error {
 		formData["Restaurant"] = utils.GetValueFromFormData(form.Value, "Restaurant")
 		formData["Address"] = utils.GetValueFromFormData(form.Value, "Address")
 		formData["Remark"] = utils.GetValueFromFormData(form.Value, "Remark")
+		formData["page"] = utils.GetValueFromFormData(form.Value, "page")
+		formData["size"] = utils.GetValueFromFormData(form.Value, "size")
+		isDone := false
+		i := 0
+		for !isDone {
+			key1 := fmt.Sprintf("sort_field_%d", i)
+			sortField := utils.GetValueFromFormData(form.Value, key1)
+			key2 := fmt.Sprintf("sort_dir_%d", i)
+			sortDir := utils.GetValueFromFormData(form.Value, key2)
+			if sortField == "" {
+				isDone = true
+				break
+			}
+			formData[key1] = sortField
+			formData[key2] = sortDir
+			i += 1
+		}
+
 		vm := models.NewQueryViewModel(formData)
 		jsonBody, err = vm.Result()
 	}

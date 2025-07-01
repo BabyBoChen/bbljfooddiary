@@ -1,1 +1,1 @@
-sudo docker build -t bbljboy/bbljfooddiary .
+sudo docker build -t registry.gitlab.com/bblj/bbljfooddiary .

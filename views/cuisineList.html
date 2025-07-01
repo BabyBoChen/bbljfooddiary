@@ -8,10 +8,26 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         {{template "partials/favicon" .}}
         <link href="/libs/fontawesome/css/all.min.css" rel="stylesheet">
-        <link href="/libs/tabulator-tables/tabulator.min.css" rel="stylesheet">
-        <script src="/libs/tabulator-tables/tabulator.min.js"></script>
+        <link href="https://unpkg.com/tabulator-tables@6.2.5/dist/css/tabulator.min.css" rel="stylesheet">
+        <script type="text/javascript" src="https://unpkg.com/tabulator-tables@6.2.5/dist/js/tabulator.min.js"></script>
         <script src="/libs/tabulator-tables/luxon.min.js"></script>
         <link href="/css/layout.css?v=_20231210" rel="stylesheet">
+        <style>        
+            .tabulator-tableholder {
+                background-color: #1e1e1e !important;
+            }
+            .tabulator-paginator {
+                text-align: left !important;
+            }
+            .tabulator .tabulator-footer {
+                background-color: black;
+                border-top: 3px solid #3FB449;
+            }
+            .tabulator .tabulator-footer .tabulator-page{
+                background-color: #3FB449;
+                border: 1px solid #3FB449;
+            }
+        </style>
     </head>
     <body>
         {{template "partials/navbar" .}}
@@ -24,7 +40,7 @@
             </div>
             <div class="index-section">
                 <h2 class="section-title">篩選器</h2>
-                <form id="frmQuery" class="section-body" style="margin-left: 30px;margin-right: 30px;" method="post" enctype="multipart/form-data">
+                <form id="frmQuery" class="section-body" style="margin-left: 30px;margin-right: 30px;" method="post" enctype="multipart/form-data" autocomplete="off">
                     
                     <div>
                         <label class="lbl-control" for="rbIsKeyword1"><input type="radio" name="IsKeyword" id="rbIsKeyword1" value="1" checked onchange="searchModeChange(this)"/>關鍵字查詢</label>
@@ -46,12 +62,12 @@
                     <label class="lbl-control" for="txtCuisineName">餐點名稱(含)：</label>                    
                     <input class="txt-control is-not-keyword" style="width: 20em;" id="txtCuisineName" name="CuisineName" disabled/>
 
-                    <label class="lbl-control">單價排序：</label>                    
+                    <!-- <label class="lbl-control">單價排序：</label>                    
                     <div>
                         <label for="rbUnitPriceOrder0"><input class="is-not-keyword" type="radio" name="UnitPriceOrder" id="rbUnitPriceOrder0" value="0" checked disabled/>無</label>
                         <label for="rbUnitPriceOrder1"><input class="is-not-keyword" type="radio" name="UnitPriceOrder" id="rbUnitPriceOrder1" value="1" disabled/>升冪</label>
                         <label for="rbUnitPriceOrder2"><input class="is-not-keyword" type="radio" name="UnitPriceOrder" id="rbUnitPriceOrder2" value="2" disabled/>降冪</label>
-                    </div> 
+                    </div>  -->
 
                     <label class="lbl-control" for="selCuisineType">類別：</label>
                     <select class="txt-control is-not-keyword" style="width: 10em;"  id="selCuisineType" name="CuisineType" disabled>
@@ -66,12 +82,12 @@
                     <label class="lbl-control" for="txtLastOrderDateTo">日期(到)：</label>                    
                     <input type="date" class="txt-control is-not-keyword" style="width: 20em;" id="txtLastOrderDateTo" name="LastOrderDateTo" disabled/>
 
-                    <label class="lbl-control" for="txtKeyword">評分排序：</label>                    
+                    <!-- <label class="lbl-control" for="txtKeyword">評分排序：</label>                    
                     <div>
                         <label for="rbReviewOrder0"><input class="is-not-keyword" type="radio" name="ReviewOrder" id="rbReviewOrder0" value="0" checked disabled/>無</label>
                         <label for="rbReviewOrder1"><input class="is-not-keyword" type="radio" name="ReviewOrder" id="rbReviewOrder1" value="1" disabled/>升冪</label>
                         <label for="rbReviewOrder2"><input class="is-not-keyword" type="radio" name="ReviewOrder" id="rbReviewOrder2" value="2" disabled/>降冪</label>
-                    </div>
+                    </div> -->
 
                     <label class="lbl-control" for="txtRestaurant">餐聽(含)：</label>                    
                     <input class="txt-control is-not-keyword" style="width: 20em;" id="txtRestaurant" name="Restaurant" disabled/>
@@ -93,18 +109,7 @@
                 <h2 class="section-title">食記清單</h2>
             </div>
             <div style="text-align: center; margin: 0px 20px;">
-                <div id="tbAllCuisine">
-                    <textarea class="viewbag" id="allCuisine">
-                        {{.AllCuisine}}
-                    </textarea>
-                </div>
-                <div>
-                    <form method="post" enctype="multipart/form-data" action="/page">
-                        <button type="button" class="btn-primary">上一頁</button>
-                        <input id="txtPage" name="page" class="txt-control" style="width:3em;display: inline;"/><label id="spanPageCnt" class="lbl-control">/0</label>
-                        <button type="button" class="btn-primary">下一頁</button>
-                        <input type="hidden" name="Filter"/>
-                    </form>
+                <div id="tbAllCuisine">                    
                 </div>
             </div>
             <form method="get" action="/" class="h-center">
@@ -115,14 +120,11 @@
         <br/>
         {{template "partials/footer" .}}
         <script>
-            let allCuisine = [];
             let tbAllCuisine = null;
+            /** @type {FormData} */
+            let queryForm = null;
 
             window.addEventListener("DOMContentLoaded", function(){
-                /** @type {HTMLTextAreaElement} */
-                let allCuisineViewbag = document.querySelector(".viewbag#allCuisine");
-                allCuisine = JSON.parse(allCuisineViewbag.value);
-                allCuisineViewbag.remove();                
 
                 tbAllCuisine = new Tabulator("#tbAllCuisine", {
                     layout:"fitDataTable",
@@ -147,10 +149,17 @@
                         { title: "地點", field: "address" },
                         { title: "備註", field: "remark" },
                     ],
+                    sortMode: "remote",
+                    ajaxURL: "/query",
+                    ajaxConfig: "POST",
+                    ajaxContentType: onAjaxPost,
+                    pagination: true,
+                    paginationMode: "remote",
+                    paginationSize: 13,
                 });
 
-                tbAllCuisine.on("tableBuilt", function(){
-                    tbAllCuisine.setData(allCuisine);
+                tbAllCuisine.on("tableBuilt", async function(){
+                    //tbAllCuisine.setPage(1);
                 });
 
                 tbAllCuisine.on("rowClick", function(e, row){
@@ -183,21 +192,22 @@
                 /** @type {HTMLFormElement} */
                 let frmQuery = document.querySelector("#frmQuery");
                 let formData = new FormData(frmQuery);
-                let cuisines = await fetch("/query", {
-                    method: "post",
-                    body: formData,
-                }).then(async function(resp){
-                    if (resp.ok) {
-                        return await resp.json();
-                    }
-                }).catch(function(err){
-                    console.log(err);
-                    return null;
-                });
-                if(cuisines){
-                    tbAllCuisine.setData(cuisines);
-                    tbAllCuisine.redraw();
-                }
+                // let cuisines = await fetch("/query", {
+                //     method: "post",
+                //     body: formData,
+                // }).then(async function(resp){
+                //     if (resp.ok) {
+                //         return await resp.json();
+                //     }
+                // }).catch(function(err){
+                //     console.log(err);
+                //     return null;
+                // });
+                // if(cuisines){
+                //     tbAllCuisine.setPage(1);
+                // }
+                queryForm = formData;
+                tbAllCuisine.setPage(1);
             }
 
             /** @param {HTMLButtonElement} btn */
@@ -215,6 +225,25 @@
                     rbIsKeyword1.checked = false;
                 }
             }
+
+            const onAjaxPost = {
+                body: function(url, config, params){
+                    let formData = new FormData();
+                    formData.append("page", params.page);
+                    formData.append("size", params.size);
+                    let sorts = params.sort;
+                    for(let i = 0; i < sorts.length; i++){
+                        formData.append(`sort_field_${i}`, sorts[i].field);
+                        formData.append(`sort_dir_${i}`, sorts[i].dir);
+                    }
+                    if(queryForm){
+                        for(let key of queryForm.keys()){
+                            formData.append(key, queryForm.get(key));
+                        }
+                    }
+                    return formData;
+                },
+            };
         </script>
     </body>
 </html>

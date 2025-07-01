@@ -6,6 +6,7 @@ import (
 	"image"
 	"io"
 	"os"
+	"slices"
 	"strconv"
 	"time"
 
@@ -226,9 +227,18 @@ func (service *CuisineService) GetApplicationName() error {
 	return err
 }
 
-func (service *CuisineService) QueryWithKeyword(keyword string) ([]map[string]interface{}, error) {
+type FormData = map[string]string
+
+func (service *CuisineService) QueryWithKeyword(formData FormData) ([]map[string]interface{}, int, error) {
 	var results []map[string]interface{}
 	var err error
+
+	keys := make([]string, 0, len(formData))
+	for k := range formData {
+		keys = append(keys, k)
+	}
+
+	keyword := formData["Keyword"]
 
 	sql := `with VI_Cuisine as 
 	(
@@ -241,15 +251,46 @@ func (service *CuisineService) QueryWithKeyword(keyword string) ([]map[string]in
 		FROM public.cuisine AS A
 		LEFT JOIN public.cuisine_type AS B ON A.cuisine_type=B.cuisine_type_id
 	)
-	select *
+	select *, COUNT(*) OVER() AS total_count
 	from VI_Cuisine
 	%s
-	ORDER BY last_order_date desc`
-	whereSql := ""
+	%s
+	%s`
+
+	whereSql := "where "
 	if len(keyword) > 0 {
-		whereSql = "where cuisine_name like $1 OR cuisine_type_name like $1 OR cast(last_order_date AS VARCHAR(10)) like $1 OR restaurant like $1 OR address like $1 OR remark like $1 "
+		whereSql += " cuisine_name like $1 OR cuisine_type_name like $1 OR cast(last_order_date AS VARCHAR(10)) like $1 OR restaurant like $1 OR address like $1 OR remark like $1 "
+	} else {
+		whereSql += "1=1 "
 	}
-	sql = fmt.Sprintf(sql, whereSql)
+
+	orderSql := "ORDER BY "
+	sortField := "x"
+	sortDir := "asc"
+	sortI := 0
+	if slices.Contains(keys, "sort_field_0") {
+		for sortField != "" {
+			sortField = formData[fmt.Sprintf("sort_field_%d", sortI)]
+			sortDir = formData[fmt.Sprintf("sort_dir_%d", sortI)]
+			if sortField == "" {
+				break
+			}
+			if sortI > 0 {
+				orderSql += ", "
+			}
+			orderSql += fmt.Sprintf(" %s %s ", sortField, sortDir)
+			sortI += 1
+		}
+	} else {
+		orderSql += " last_order_date desc "
+	}
+
+	limitSql := "LIMIT %d OFFSET %d"
+	size, _ := strconv.Atoi(formData["size"])
+	page, _ := strconv.Atoi(formData["page"])
+	limitSql = fmt.Sprintf(limitSql, size, (page-1)*size)
+
+	sql = fmt.Sprintf(sql, whereSql, orderSql, limitSql)
 
 	var dt *pgdbcontext.DataTable
 	if len(keyword) > 0 {
@@ -258,15 +299,25 @@ func (service *CuisineService) QueryWithKeyword(keyword string) ([]map[string]in
 		dt, err = service.db.Query(sql)
 	}
 
+	totalCount := 0
 	if err == nil {
 		results = toSliceMap(dt)
+		if len(results) > 0 {
+			i64, _ := results[0]["total_count"].(int64)
+			totalCount = int(i64)
+		}
 	}
-	return results, err
+	return results, totalCount, err
 }
 
-func (service *CuisineService) QueryWithFields(formData map[string]string) ([]map[string]interface{}, error) {
+func (service *CuisineService) QueryWithFields(formData FormData) ([]map[string]interface{}, int, error) {
 	var results []map[string]interface{}
 	var err error
+
+	keys := make([]string, 0, len(formData))
+	for k := range formData {
+		keys = append(keys, k)
+	}
 
 	sql := `WITH VI_Cuisine AS 
 	(
@@ -280,12 +331,13 @@ func (service *CuisineService) QueryWithFields(formData map[string]string) ([]ma
 		FROM public.cuisine AS A
 		LEFT JOIN public.cuisine_type AS B ON A.cuisine_type=B.cuisine_type_id
 	)
-	SELECT *
-	FROM VI_Cuisine
-	WHERE %s
-	ORDER BY %s last_order_date DESC`
+	select *, COUNT(*) OVER() AS total_count
+	from VI_Cuisine
+	%s
+	%s
+	%s`
 
-	whereSql := "1=1"
+	whereSql := "WHERE 1=1 "
 	paramIndex := "$1"
 	parameters := make([]interface{}, 0)
 	if utils.MapContainsKey[string](formData, "CuisineName") && len(formData["CuisineName"]) > 0 {
@@ -366,39 +418,72 @@ func (service *CuisineService) QueryWithFields(formData map[string]string) ([]ma
 			paramIndex = "$" + fmt.Sprintf("%d", len(parameters)+1)
 		}
 	}
-	orderBySql := ""
-	ord := map[string]string{
-		"0": "0",
-		"1": "1",
-		"2": "2",
-	}
-	if err == nil {
-		if utils.MapContainsKey[string](formData, "UnitPriceOrder") && formData["UnitPriceOrder"] != "0" && utils.MapContainsKey[string](ord, formData["UnitPriceOrder"]) {
-			if formData["UnitPriceOrder"] == "1" {
-				orderBySql += "unit_price ASC, "
-			} else {
-				orderBySql += "unit_price DESC, "
+
+	orderSql := "ORDER BY "
+	sortField := "x"
+	sortDir := "asc"
+	sortI := 0
+	if slices.Contains(keys, "sort_field_0") {
+		for sortField != "" {
+			sortField = formData[fmt.Sprintf("sort_field_%d", sortI)]
+			sortDir = formData[fmt.Sprintf("sort_dir_%d", sortI)]
+			if sortField == "" {
+				break
 			}
-		}
-	}
-	if err == nil {
-		if utils.MapContainsKey[string](formData, "ReviewOrder") && formData["ReviewOrder"] != "0" && utils.MapContainsKey[string](ord, formData["ReviewOrder"]) {
-			if formData["ReviewOrder"] == "1" {
-				orderBySql += "review ASC, "
-			} else {
-				orderBySql += "review DESC, "
+			if sortI > 0 {
+				orderSql += ", "
 			}
+			orderSql += fmt.Sprintf(" %s %s ", sortField, sortDir)
+			sortI += 1
 		}
+	} else {
+		orderSql += " last_order_date desc "
 	}
-	sql = fmt.Sprintf(sql, whereSql, orderBySql)
+
+	limitSql := "LIMIT %d OFFSET %d"
+	size, _ := strconv.Atoi(formData["size"])
+	page, _ := strconv.Atoi(formData["page"])
+	limitSql = fmt.Sprintf(limitSql, size, (page-1)*size)
+
+	//orderBySql := ""
+	// ord := map[string]string{
+	// 	"0": "0",
+	// 	"1": "1",
+	// 	"2": "2",
+	// }
+	// if err == nil {
+	// 	if utils.MapContainsKey[string](formData, "UnitPriceOrder") && formData["UnitPriceOrder"] != "0" && utils.MapContainsKey[string](ord, formData["UnitPriceOrder"]) {
+	// 		if formData["UnitPriceOrder"] == "1" {
+	// 			orderBySql += "unit_price ASC, "
+	// 		} else {
+	// 			orderBySql += "unit_price DESC, "
+	// 		}
+	// 	}
+	// }
+	// if err == nil {
+	// 	if utils.MapContainsKey[string](formData, "ReviewOrder") && formData["ReviewOrder"] != "0" && utils.MapContainsKey[string](ord, formData["ReviewOrder"]) {
+	// 		if formData["ReviewOrder"] == "1" {
+	// 			orderBySql += "review ASC, "
+	// 		} else {
+	// 			orderBySql += "review DESC, "
+	// 		}
+	// 	}
+	// }
+
+	sql = fmt.Sprintf(sql, whereSql, orderSql, limitSql)
 	var dt *pgdbcontext.DataTable
 	if err == nil {
 		dt, err = service.db.Query(sql, parameters...)
 	}
+	totalCount := 0
 	if err == nil {
 		results = toSliceMap(dt)
+		if len(results) > 0 {
+			i64, _ := results[0]["total_count"].(int64)
+			totalCount = int(i64)
+		}
 	}
-	return results, err
+	return results, totalCount, err
 }
 
 func (service *CuisineService) GetCuisineByCuisineId(cuisineId string) (map[string]interface{}, error) {
